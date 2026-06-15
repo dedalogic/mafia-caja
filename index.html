@@ -241,7 +241,7 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--i
       <option value="unidad">UNIDAD</option>
       <option value="caja">CAJA</option>
       <option value="paquete">PAQUETE</option>
-      <option value="sixpack">6-PACK (Sixpack)</option>
+      <option value="sixpack">Sixpack (6 unidades)</option>
     </select>
     <select id="ma-cat" style="width:100%;background:var(--surface);border:1.5px solid transparent;border-radius:var(--r);padding:13px 14px;font-family:var(--font);font-size:14px;color:var(--ink);outline:none;-webkit-appearance:none;">
       <option value="Bebidas">Bebidas</option>
@@ -362,7 +362,6 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--i
   <div class="ped-top">
     <div class="pill-bar" id="ped-pills" style="padding:0;border:none;background:none;flex:1;overflow-x:auto;display:flex;gap:6px;"></div>
     <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-      <div id="ped-counter" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:4px 9px;font-size:12px;font-weight:700;color:var(--gray);white-space:nowrap;">0/2</div>
       <button class="ibtn" onclick="previsualizarPed()" title="Revisar pedido">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       </button>
@@ -422,8 +421,8 @@ const PRODS=[
   {id:'cc220n',  name:'Coca Cola Normal 220ml',  cat:'Bebidas', unit:'sixpack', prov:'Coca Cola / Dilinor',ped:'Bebidas', desc:'Lata 220ml. Se pide por sixpack (6 unidades).'},
   {id:'fa220z',  name:'Fanta Zero 220ml',        cat:'Bebidas', unit:'sixpack', prov:'Coca Cola / Dilinor',ped:'Bebidas', desc:'Lata 220ml. Se pide por sixpack.'},
   {id:'fa220n',  name:'Fanta Normal 220ml',      cat:'Bebidas', unit:'sixpack', prov:'Coca Cola / Dilinor',ped:'Bebidas', desc:'Lata 220ml. Se pide por sixpack.'},
-  {id:'ag_gas',  name:'Agua con Gas',            cat:'Bebidas', unit:'unidad',  prov:'Coca Cola / Dilinor',ped:'Bebidas', desc:'Botella 500ml o similar. Unidades sueltas.'},
-  {id:'ag_sgas', name:'Agua sin Gas',            cat:'Bebidas', unit:'unidad',  prov:'Coca Cola / Dilinor',ped:'Bebidas', desc:'Botella 500ml o similar. Unidades sueltas.'},
+  {id:'ag_gas',  name:'Agua con Gas',            cat:'Bebidas', unit:'sixpack', prov:'Coca Cola / Dilinor',ped:'Bebidas', desc:'Botella 500ml. Se pide por Sixpack (6 unidades).'},
+  {id:'ag_sgas', name:'Agua sin Gas',            cat:'Bebidas', unit:'sixpack', prov:'Coca Cola / Dilinor',ped:'Bebidas', desc:'Botella 500ml. Se pide por Sixpack (6 unidades).'},
   {id:'sp220n',  name:'Sprite Normal 220ml',     cat:'Bebidas', unit:'sixpack', prov:'Coca Cola / Dilinor',ped:'Bebidas', desc:'Lata 220ml. Se pide por sixpack.'},
   {id:'sp220z',  name:'Sprite Zero 220ml',       cat:'Bebidas', unit:'sixpack', prov:'Coca Cola / Dilinor',ped:'Bebidas', desc:'Lata 220ml. Se pide por sixpack.'},
   {id:'cc15z',   name:'Coca Cola Zero 1.5L',     cat:'Bebidas', unit:'unidad',  prov:'Coca Cola / Dilinor',ped:'Bebidas', desc:'Botella 1.5L. Se pide por unidad.'},
@@ -542,7 +541,7 @@ function renderInvList(prods){
     const it=S.inv[p.id];
     if(!it)return;
     const isBebida=p.cat==='Bebidas';
-    const fixedLbl=p.unit==='sixpack'?'6-PACK':'UNID';
+    const fixedLbl=p.unit==='sixpack'?'Sixpack':'UNID';
     const rightInv=isBebida
       ?`<span class="unit-lbl">${fixedLbl}</span>`
       :`<button class="box-toggle${it.modo==='c'?' caja':''}" id="ibt-${p.id}" onclick="togInvModo('${p.id}')">${it.modo==='c'?'CAJA':'UNID'}</button>`;
@@ -560,6 +559,15 @@ function renderInvList(prods){
     list.appendChild(row);
     updInvRow(p.id);
   });
+  /* Botón agregar producto */
+  const addInvRow=document.createElement('div');addInvRow.style.cssText='padding:12px 0;';
+  const activeCat=document.querySelector('#inv-pills .pill.active');
+  const currentCat=activeCat?activeCat.textContent:INV_CATS[0];
+  addInvRow.innerHTML=`<button onclick="abrirModalAgregar('${currentCat}')" style="width:100%;padding:12px;border-radius:var(--r);border:1.5px dashed var(--surface2);background:transparent;font-family:var(--font);font-size:13px;font-weight:600;color:var(--gray);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Agregar producto
+  </button>`;
+  list.appendChild(addInvRow);
 }
 function togInvModo(id){
   S.inv[id].modo=S.inv[id].modo==='u'?'c':'u';
@@ -592,7 +600,7 @@ function togPedModo(id){
   if(btn){
     const isCaja=S.ped[id].modo==='c';
     const p=PRODS.find(x=>x.id===id);
-    btn.textContent=isCaja?'CAJA':(p&&p.unit==='sixpack'?'6-PACK':'UNID');
+    btn.textContent=isCaja?'CAJA':(p&&p.unit==='sixpack'?'Sixpack':'UNID');
     btn.classList.toggle('caja',isCaja);
   }
 }
@@ -602,7 +610,6 @@ function iniciarPed(){
   S.ped={};
   PRODS.forEach(p=>{S.ped[p.id]={q:0,modo:'u'};});
   buildPedPills();
-  updPedCounter();
   const ps=document.getElementById('ped-search');if(ps)ps.value='';
   switchPedTab(INV_CATS[0],document.querySelector('#ped-pills .pill'));
 }
@@ -627,7 +634,7 @@ function renderPedList(cat){
     const ps=S.ped[p.id]||{q:0,modo:'u'};
     const isCaja=ps.modo==='c';
     const isBebida=p.cat==='Bebidas';
-    const fixedLbl=p.unit==='sixpack'?'6-PACK':'UNID';
+    const fixedLbl=p.unit==='sixpack'?'Sixpack':'UNID';
     const rightEl=isBebida
       ?`<span class="unit-lbl">${fixedLbl}</span>`
       :`<button class="box-toggle${isCaja?' caja':''}" id="pbt-${p.id}" onclick="togPedModo('${p.id}')">${isCaja?'CAJA':'UNID'}</button>`;
@@ -652,22 +659,14 @@ function renderPedList(cat){
   </button>`;
   list.appendChild(addRow);
 }
-function updPedCounter(){
-  const total=Object.values(S.ped||{}).filter(v=>v&&v.q>0).length;
-  const el=document.getElementById('ped-counter');
-  if(!el)return;
-  el.textContent=total>0?`${total} items`:'0 items';
-  el.style.background=total>0?'var(--green-bg)':'var(--surface)';
-  el.style.borderColor=total>0?'var(--green-border)':'var(--border)';
-  el.style.color=total>0?'var(--green)':'var(--gray)';
-}
+
 function _buildPedMsgByProv(){
   /* Agrupa por proveedor respetando modo u/c */
   const byProv={};
   PRODS.forEach(p=>{
     const ps=S.ped[p.id];if(!ps||ps.q===0)return;
     if(!byProv[p.cat])byProv[p.cat]=[];
-    const modoLbl=p.cat==='Bebidas'?(p.unit==='sixpack'?'6-PACK':'UNID'):(ps.modo==='c'?'CAJA':'UNID');
+    const modoLbl=p.cat==='Bebidas'?(p.unit==='sixpack'?'Sixpack':'UNID'):(ps.modo==='c'?'CAJA':'UNID');
     byProv[p.cat].push(`• ${p.name}: ${ps.q} ${modoLbl}`);
   });
   return byProv;
@@ -680,7 +679,6 @@ function enviarPedido(){
     const msg=`*PEDIDO ${prov.toUpperCase()} — MAFIA*\n${S.u} · ${fLarga()}\n\n${byProv[prov].join('\n')}`;
     setTimeout(()=>abrirWA(msg),i*500);
   });
-  updPedCounter();
   toast(`${provs.length} pedido${provs.length>1?'s':''} enviado${provs.length>1?'s':''}`);
 }
 function previsualizarPed(){
@@ -724,7 +722,6 @@ function confirmarAgregar(){
   /* Si inventario está activo, también refrescar */
   const activePill=document.querySelector('#inv-pills .pill.active');
   if(activePill&&activePill.textContent===cat)renderInvList(PRODS.filter(p=>p.cat===cat));
-  updPedCounter();
   toast('Producto agregado en inventario y pedido');
 }
 
@@ -734,7 +731,7 @@ function filterPed(q){
   PRODS.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())).forEach(p=>{
     const ps=S.ped[p.id]||{q:0,modo:'u'};
     const isCaja=ps.modo==='c';
-    const fxLbl=p.unit==='sixpack'?'6-PACK':'UNID';
+    const fxLbl=p.unit==='sixpack'?'Sixpack':'UNID';
     const fRight=p.cat==='Bebidas'
       ?`<span class="unit-lbl">${fxLbl}</span>`
       :`<button class="box-toggle${isCaja?' caja':''}" id="pbt-${p.id}" onclick="togPedModo('${p.id}')">${isCaja?'CAJA':'UNID'}</button>`;
