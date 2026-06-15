@@ -104,11 +104,11 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--i
 .ccard{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:4px 14px;box-shadow:var(--shadow);}
 
 /* MSG BLOCK */
-.msg-block{background:var(--surface);border-radius:var(--r);overflow:hidden;}
+.msg-block{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);}
 .msg-hdr{padding:9px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .msg-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);}
 .msg-hint{font-size:11px;color:var(--gray-light);}
-.msg-ta{width:100%;background:transparent;border:none;outline:none;padding:12px 13px;font-family:var(--font);font-size:13px;line-height:1.75;color:var(--ink);resize:none;min-height:100px;}
+.msg-ta{width:100%;background:var(--bg);border:none;outline:none;padding:12px 13px;font-family:var(--font);font-size:13px;line-height:1.75;color:var(--ink);resize:none;min-height:100px;}
 
 /* STAT */
 .stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
@@ -185,6 +185,23 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--i
 .box-toggle{flex-shrink:0;margin-left:6px;background:var(--surface2);border:none;border-radius:6px;padding:0;width:46px;height:30px;font-family:var(--font);font-size:11px;font-weight:700;color:var(--gray);cursor:pointer;transition:all .15s;text-align:center;}.unit-lbl{flex-shrink:0;margin-left:6px;width:46px;text-align:center;font-size:11px;font-weight:700;color:var(--gray-light);}
 .box-toggle.caja{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);}
 
+/* HISTORIAL */
+.hist-entry{border-radius:var(--r);padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .15s;}
+.hist-entry:active{opacity:.85;}
+.hist-entry.inv-type{background:var(--surface);}
+.hist-entry.ped-type{background:var(--red);color:#fff;}
+.hist-entry-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.hist-type-label{font-size:12px;font-weight:700;letter-spacing:.04em;}
+.hist-entry.inv-type .hist-type-label{color:var(--ink);}
+.hist-entry.ped-type .hist-type-label{color:rgba(255,255,255,0.9);}
+.hist-entry-meta{font-size:12px;font-weight:500;}
+.hist-entry.inv-type .hist-entry-meta{color:var(--gray);}
+.hist-entry.ped-type .hist-entry-meta{color:rgba(255,255,255,0.75);}
+.hist-del{background:none;border:none;font-size:17px;cursor:pointer;padding:2px 6px;line-height:1;flex-shrink:0;}
+.hist-entry.inv-type .hist-del{color:var(--gray-light);}
+.hist-entry.ped-type .hist-del{color:rgba(255,255,255,0.5);}
+.hist-empty{padding:40px 20px;text-align:center;font-size:13px;color:var(--gray-light);}
+.hist-filter-row{display:flex;gap:8px;padding:12px 18px;flex-shrink:0;border-bottom:1px solid var(--border);}
 /* TOAST */
 .toast{position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translateX(-50%) translateY(-6px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:var(--r-pill);font-size:13px;font-weight:600;opacity:0;transition:all .22s var(--ease);z-index:9999;white-space:nowrap;pointer-events:none;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -228,6 +245,10 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--i
   <button class="nbtn" id="nb-2" onclick="navPed()">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
     <span>Pedido</span>
+  </button>
+  <button class="nbtn" id="nb-3" onclick="navHist()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="12" x2="15" y2="14"/></svg>
+    <span>Historial</span>
   </button>
 </nav>
 
@@ -296,6 +317,11 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--i
         <div><div class="mc-title">Pedido sugerido</div><div class="mc-desc">Bebidas e insumos por proveedor</div></div>
         <svg class="mc-arr" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
+      <div class="mc" onclick="navHist()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="12" x2="15" y2="14"/></svg>
+        <div><div class="mc-title">Historial</div><div class="mc-desc">Conteos y pedidos guardados</div></div>
+        <svg class="mc-arr" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
     </div>
   </div>
 </div>
@@ -306,6 +332,9 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--i
     <span class="topbar-title">INVENTARIO</span>
     <div class="hdr-right">
       <div class="spill" id="inv-spill">—</div>
+      <button class="ibtn" onclick="importarDesdeHistorial('inv')" title="Cargar desde historial">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+      </button>
       <button class="ibtn" onclick="reiniciarInv()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
       </button>
@@ -341,11 +370,20 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--i
     </div>
   </div>
   <div class="cta">
-    <button class="btn btn-surface" onclick="exportarInv()">Exportar Excel</button>
-    <button class="btn btn-wa" onclick="enviarWA('pmsg-inv')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.121 1.532 5.849L.054 23.5l5.821-1.527A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.651-.507-5.173-1.392l-.371-.221-3.853 1.011 1.029-3.752-.242-.387A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
-      Enviar
-    </button>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+      <button class="btn btn-red" style="font-size:13px;padding:13px 6px;" onclick="guardarInvHist()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Guardar
+      </button>
+      <button class="btn btn-surface" style="font-size:13px;padding:13px 6px;" onclick="exportarInv()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2l2 4h-2l-1-2-1 2H6l2-4z"/></svg>
+        Excel
+      </button>
+      <button class="btn btn-wa" style="font-size:13px;padding:13px 6px;" onclick="enviarWA('pmsg-inv')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.121 1.532 5.849L.054 23.5l5.821-1.527A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.651-.507-5.173-1.392l-.371-.221-3.853 1.011 1.029-3.752-.242-.387A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        Enviar
+      </button>
+    </div>
   </div>
 </div>
 
@@ -353,7 +391,12 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--i
 <div class="screen" id="sc-ped">
   <div class="topbar">
     <span class="topbar-title">PEDIDO</span>
-    <div class="spill" id="ped-spill">—</div>
+    <div class="hdr-right">
+      <button class="ibtn" onclick="importarDesdeHistorial('ped')" title="Cargar desde historial">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+      </button>
+      <div class="spill" id="ped-spill">—</div>
+    </div>
   </div>
   <div class="ped-top">
     <div class="pill-bar" id="ped-pills" style="padding:0;border:none;background:none;flex:1;overflow-x:auto;display:flex;gap:6px;"></div>
@@ -586,6 +629,10 @@ function irResumenInv(){
     cero.forEach(p=>{msg+='• '+p.name+'\n';});
   }
   document.getElementById('pmsg-inv').value=msg.trim();
+  /* Guardar en historial */
+  const invData={};
+  PRODS.forEach(p=>{if(S.inv[p.id])invData[p.id]={q:S.inv[p.id].q};});
+  histGuardar('inv',msg.trim(),invData);
   goTo('sc-inv-res');setNav(1);
 }
 function reiniciarInv(){if(!confirm('¿Reiniciar inventario?'))return;iniciarInv();}
@@ -767,9 +814,188 @@ function enviarWA(elId){
   abrirWA(msg);
 }
 
+
+/* ── HISTORIAL ── */
+const HIST_KEY='mafia_caja_hist';
+let _histFilter='todo';
+let _histDetEntry=null;
+let _importType=null;
+
+function histGuardar(tipo,msg,data){
+  var hist=JSON.parse(localStorage.getItem(HIST_KEY)||'[]');
+  var entry={id:Date.now(),tipo:tipo,user:S.u,turno:S.t==='mañana'?'AM':'PM',fecha:fLarga(),ts:Date.now(),msg:msg,data:JSON.stringify(data)};
+  hist.unshift(entry);
+  if(hist.length>50)hist=hist.slice(0,50);
+  localStorage.setItem(HIST_KEY,JSON.stringify(hist));
+}
+function histCargar(){
+  return JSON.parse(localStorage.getItem(HIST_KEY)||'[]');
+}
+function histEliminar(id){
+  var hist=histCargar().filter(function(e){return e.id!==id;});
+  localStorage.setItem(HIST_KEY,JSON.stringify(hist));
+  renderHist();
+}
+function navHist(){
+  var el=document.getElementById('hist-spill');
+  if(el&&S.u)el.textContent=pillTxt();
+  filterHist('todo',document.getElementById('hf-todo'));
+  goTo('sc-hist');setNav(3);showNav(true);
+}
+function filterHist(f,btn){
+  _histFilter=f;
+  document.querySelectorAll('.hist-filter-row .pill').forEach(function(b){b.classList.remove('active');});
+  if(btn)btn.classList.add('active');
+  renderHist();
+}
+function fShort(ts){
+  var d=new Date(ts);
+  var dd=String(d.getDate()).padStart(2,'0');
+  var mm=String(d.getMonth()+1).padStart(2,'0');
+  var hh=String(d.getHours()).padStart(2,'0');
+  var min=String(d.getMinutes()).padStart(2,'0');
+  return dd+'/'+mm+' '+hh+':'+min;
+}
+function renderHist(){
+  var list=document.getElementById('hist-list');
+  if(!list)return;
+  list.innerHTML='';
+  var entries=histCargar();
+  if(_histFilter!=='todo')entries=entries.filter(function(e){return e.tipo===_histFilter;});
+  if(!entries.length){
+    list.innerHTML='<div class="hist-empty">No hay registros guardados aún.<br><br>Los conteos y pedidos se guardan automáticamente al enviar.</div>';
+    return;
+  }
+  entries.forEach(function(e){
+    var div=document.createElement('div');
+    div.className='hist-entry '+(e.tipo==='inv'?'inv-type':'ped-type');
+    var label=e.tipo==='inv'?'Inventario':'Pedido';
+    var meta=e.user+' '+e.turno+' · '+fShort(e.ts);
+    div.innerHTML='<div class="hist-entry-hdr"><span class="hist-type-label">'+label+'</span><button class="hist-del" onclick="event.stopPropagation();histEliminar('+e.id+')">×</button></div><div class="hist-entry-meta">'+meta+'</div>';
+    div.onclick=function(){abrirDetHist(e);};
+    list.appendChild(div);
+  });
+}
+function abrirDetHist(e){
+  _histDetEntry=e;
+  document.getElementById('hd-type').textContent=e.tipo==='inv'?'Inventario':'Pedido';
+  document.getElementById('hd-date').textContent=e.user+' '+e.turno+' · '+fShort(e.ts);
+  document.getElementById('hd-tag').innerHTML='<span class="hist-type-tag '+e.tipo+'">'+(e.tipo==='inv'?'Inventario':'Pedido')+'</span>';
+  document.getElementById('hd-msg').textContent=e.msg||'Sin mensaje guardado';
+  openModal('modal-hist-det');
+}
+function cargarDesdeModal(){
+  if(!_histDetEntry)return;
+  closeModal('modal-hist-det');
+  cargarEntrada(_histDetEntry);
+}
+function importarDesdeHistorial(tipo){
+  _importType=tipo;
+  var entries=histCargar().filter(function(e){return e.tipo===tipo;});
+  var el=document.getElementById('mi-list');
+  document.getElementById('mi-title').textContent=tipo==='inv'?'Cargar inventario':'Cargar pedido';
+  el.innerHTML='';
+  if(!entries.length){
+    el.innerHTML='<div class="hist-empty">No hay registros de '+(tipo==='inv'?'inventario':'pedido')+' guardados.</div>';
+  } else {
+    entries.slice(0,10).forEach(function(e){
+      var btn=document.createElement('button');
+      btn.style.cssText='width:100%;text-align:left;background:var(--surface);border:1.5px solid transparent;border-radius:var(--r);padding:13px 14px;font-family:var(--font);cursor:pointer;margin-bottom:6px;';
+      btn.innerHTML='<div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px;">'+e.user+' · '+e.turno+'</div><div style="font-size:12px;color:var(--gray);">'+e.fecha+'</div>';
+      btn.onclick=function(){closeModal('modal-importar');cargarEntrada(e);};
+      el.appendChild(btn);
+    });
+  }
+  openModal('modal-importar');
+}
+function cargarEntrada(e){
+  if(!e.data)return;
+  try{
+    var data=JSON.parse(e.data);
+    if(e.tipo==='inv'){
+      if(!S.inv||Object.keys(S.inv).length===0)iniciarInv();
+      Object.keys(data).forEach(function(id){if(S.inv[id])S.inv[id].q=data[id].q||0;});
+      navInv();
+      toast('Inventario cargado');
+    } else {
+      if(!S.ped||Object.keys(S.ped).length===0)iniciarPed();
+      Object.keys(data).forEach(function(id){if(S.ped[id])S.ped[id]={q:data[id].q||0,modo:data[id].modo||'u'};});
+      navPed();
+      toast('Pedido cargado');
+    }
+  }catch(err){toast('Error al cargar registro');}
+}
+
+/* ── EXPORTAR + GUARDAR ── */
+function guardarInvHist(){
+  var msg=document.getElementById('pmsg-inv').value;
+  var invData={};
+  PRODS.forEach(function(p){if(S.inv[p.id])invData[p.id]={q:S.inv[p.id].q};});
+  histGuardar('inv',msg,invData);
+  toast('Guardado en historial');
+}
+function exportarInv(){
+  var csv='Producto,Categoría,Proveedor,Unidad,Stock\n';
+  PRODS.forEach(function(p){
+    var q=S.inv[p.id]?S.inv[p.id].q:0;
+    csv+='"'+p.name+'","'+p.cat+'","'+p.prov+'","'+p.unit+'",'+q+'\n';
+  });
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.download='inventario_caja_'+fCorta().replace('/','_')+'.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Excel descargado');
+}
+
 /* ── TOAST ── */
 let _tt=null;
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');if(_tt)clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2800);}
 </script>
+
+<!-- ══ HISTORIAL ══ -->
+<div class="screen" id="sc-hist">
+  <div class="topbar">
+    <span class="topbar-title">HISTORIAL</span>
+    <div class="spill" id="hist-spill">—</div>
+  </div>
+  <div class="hist-filter-row">
+    <button class="pill active" id="hf-todo" onclick="filterHist('todo',this)">Todo</button>
+    <button class="pill" id="hf-inv" onclick="filterHist('inv',this)">Inventarios</button>
+    <button class="pill" id="hf-ped" onclick="filterHist('ped',this)">Pedidos</button>
+  </div>
+  <div class="scroll" style="padding:12px 18px 100px;" id="hist-list"></div>
+</div>
+
+<!-- MODAL DETALLE HISTORIAL -->
+<div id="modal-hist-det" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.35);align-items:flex-end;justify-content:center;">
+  <div class="modal-box" style="max-height:80vh;display:flex;flex-direction:column;gap:10px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div class="modal-title" id="hd-type">—</div>
+        <div class="modal-name" id="hd-date" style="font-size:15px;margin-bottom:0;">—</div>
+      </div>
+      <div id="hd-tag"></div>
+    </div>
+    <div style="overflow-y:auto;flex:1;background:var(--surface);border-radius:var(--r);padding:12px 14px;">
+      <pre id="hd-msg" style="font-family:var(--font);font-size:13px;line-height:1.75;color:var(--ink);white-space:pre-wrap;"></pre>
+    </div>
+    <button onclick="cargarDesdeModal()" style="width:100%;padding:14px;border-radius:var(--r);border:none;background:var(--red);color:#fff;font-family:var(--font);font-size:15px;font-weight:600;cursor:pointer;">Cargar este registro</button>
+    <button onclick="closeModal('modal-hist-det')" style="width:100%;padding:12px;border-radius:var(--r);border:none;background:var(--surface2);font-family:var(--font);font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;">Cerrar</button>
+  </div>
+</div>
+
+<!-- MODAL IMPORTAR ──  seleccionar registro para cargar -->
+<div id="modal-importar" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.35);align-items:flex-end;justify-content:center;">
+  <div class="modal-box" style="max-height:75vh;display:flex;flex-direction:column;gap:10px;">
+    <div class="modal-title" id="mi-title">Cargar desde historial</div>
+    <div style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:8px;" id="mi-list"></div>
+    <button onclick="closeModal('modal-importar')" style="width:100%;padding:12px;border-radius:var(--r);border:none;background:var(--surface2);font-family:var(--font);font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;">Cancelar</button>
+  </div>
+</div>
 </body>
 </html>
