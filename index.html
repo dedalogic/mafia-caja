@@ -669,8 +669,9 @@ function _buildPedMsgByProv(){
   PRODS.forEach(p=>{
     const ps=S.ped[p.id];if(!ps||ps.q===0)return;
     if(!byProv[p.cat])byProv[p.cat]=[];
-    const modoLbl=p.cat==='Bebidas'?(p.unit==='sixpack'?'Sixpack':'UNID'):(ps.modo==='c'?'CAJA':'UNID');
-    byProv[p.cat].push(`• ${p.name}: ${ps.q} ${modoLbl}`);
+    const unitWord=p.unit==='sixpack'?'Sixpack':(ps.modo==='c'?'Caja':'Unidad');
+    const unitPlural=ps.q===1?unitWord:(unitWord==='Unidad'?'Unidades':unitWord+'s');
+    byProv[p.cat].push('• '+ps.q+' '+unitPlural+' '+p.name);
   });
   return byProv;
 }
