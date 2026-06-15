@@ -19,9 +19,9 @@
   --red:#8B151A;
   --red-bg:rgba(139,21,26,0.07);
   --red-border:rgba(139,21,26,0.2);
-  --green:#0A7B52;
-  --green-bg:rgba(10,123,82,0.08);
-  --green-border:rgba(10,123,82,0.28);
+  --green:#128C7E;
+  --green-bg:rgba(18,140,126,0.08);
+  --green-border:rgba(18,140,126,0.28);
   --border:rgba(0,0,0,0.08);
   --shadow:0 1px 6px rgba(0,0,0,0.06);
   --font:'DM Sans',sans-serif;
@@ -183,7 +183,7 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--i
 .ped-val.hi{color:var(--red);}
 
 .box-toggle{flex-shrink:0;margin-left:6px;background:var(--surface2);border:none;border-radius:6px;padding:0;width:46px;height:30px;font-family:var(--font);font-size:11px;font-weight:700;color:var(--gray);cursor:pointer;transition:all .15s;text-align:center;}.unit-lbl{flex-shrink:0;margin-left:6px;width:46px;text-align:center;font-size:11px;font-weight:700;color:var(--gray-light);}
-.box-toggle.caja{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green);}
+.box-toggle.caja{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);}
 
 /* TOAST */
 .toast{position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translateX(-50%) translateY(-6px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:var(--r-pill);font-size:13px;font-weight:600;opacity:0;transition:all .22s var(--ease);z-index:9999;white-space:nowrap;pointer-events:none;}
@@ -334,10 +334,6 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--i
   </div>
   <div class="scroll">
     <div style="padding:14px 18px 140px;display:flex;flex-direction:column;gap:12px;">
-      <div class="stat-row">
-        <div class="stat-box red"><div class="stat-num" id="surg">0</div><div class="stat-lbl">Sin stock</div></div>
-        <div class="stat-box amber"><div class="stat-num" id="sbajo">0</div><div class="stat-lbl">Stock bajo</div></div>
-      </div>
       <div class="msg-block">
         <div class="msg-hdr"><span class="msg-lbl">Mensaje WhatsApp</span><span class="msg-hint">Editable</span></div>
         <textarea class="msg-ta" id="pmsg-inv" rows="10"></textarea>
@@ -345,7 +341,7 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--i
     </div>
   </div>
   <div class="cta">
-    <button class="btn btn-red" onclick="exportarInv()">Exportar detalle (CSV)</button>
+    <button class="btn btn-surface" onclick="exportarInv()">Exportar Excel</button>
     <button class="btn btn-wa" onclick="enviarWA('pmsg-inv')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.121 1.532 5.849L.054 23.5l5.821-1.527A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.651-.507-5.173-1.392l-.371-.221-3.853 1.011 1.029-3.752-.242-.387A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
       Enviar
@@ -571,21 +567,25 @@ function updInvRow(id){
   row.style.opacity='1';
 }
 function irResumenInv(){
-  const cero=[],bajo=[];
-  PRODS.forEach(p=>{
-    const q=S.inv[p.id]?S.inv[p.id].q:0;
-    if(q===0)cero.push(p);
-    else if(q<3)bajo.push(p);
-  });
-  document.getElementById('surg').textContent=cero.length;
-  document.getElementById('sbajo').textContent=bajo.length;
   const turno=S.t==='mañana'?'AM':'PM';
   let msg='*INVENTARIO CAJA — MAFIA*\n'+S.u+' · '+turno+' · '+fLarga()+'\n\n';
-  if(cero.length){msg+='*86 (SIN STOCK)*\n';cero.forEach(p=>{msg+='• '+p.name+'\n';});msg+='\n';}
-  if(bajo.length){msg+='*STOCK BAJO*\n';bajo.forEach(p=>{msg+='• '+p.name+': '+S.inv[p.id].q+'\n';});msg+='\n';}
-  if(!cero.length&&!bajo.length)msg+='Todo el stock en orden.';
-  else msg+='El resto en orden.';
-  document.getElementById('pmsg-inv').value=msg;
+  const cero=[];
+  INV_CATS.forEach(cat=>{
+    const items=PRODS.filter(p=>p.cat===cat&&S.inv[p.id]);
+    if(!items.length)return;
+    msg+='*'+cat.toUpperCase()+'*\n';
+    items.forEach(p=>{
+      const q=S.inv[p.id].q;
+      if(q===0)cero.push(p);
+      else msg+='• '+p.name+': '+q+'\n';
+    });
+    msg+='\n';
+  });
+  if(cero.length){
+    msg+='*86 (SIN STOCK)*\n';
+    cero.forEach(p=>{msg+='• '+p.name+'\n';});
+  }
+  document.getElementById('pmsg-inv').value=msg.trim();
   goTo('sc-inv-res');setNav(1);
 }
 function reiniciarInv(){if(!confirm('¿Reiniciar inventario?'))return;iniciarInv();}
