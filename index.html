@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<title>Mafia</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F7F5F0">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFFFF;
+  --surface:#F5F2EC;
+  --surface2:#E8E3D8;
+  --black:#1A1A1C;
+  --ink:#2C2C2E;
+  --gray:#6B6966;
+  --gray-light:#B0ADA8;
+  --red:#8B151A;
+  --red-bg:rgba(139,21,26,0.07);
+  --red-border:rgba(139,21,26,0.2);
+  --green:#0A7B52;
+  --green-bg:rgba(10,123,82,0.08);
+  --green-border:rgba(10,123,82,0.28);
+  --border:rgba(0,0,0,0.08);
+  --shadow:0 1px 6px rgba(0,0,0,0.06);
+  --shadow-up:0 -1px 12px rgba(0,0,0,0.06);
+  --font:'DM Sans',sans-serif;
+  --ease:cubic-bezier(0.22,0.8,0.22,1);
+  --r:14px; --r-lg:18px; --r-pill:100px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--ink);max-width:480px;margin:0 auto;overflow:hidden;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{display:none;}
+
+.screen{display:none;flex-direction:column;height:100dvh;overflow:hidden;}
+.screen.active{display:flex;}
+@keyframes fu{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.screen.active{animation:fu 0.24s var(--ease);}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;min-height:0;}
+
+/* ── TOPBAR ── */
+.topbar{padding:calc(10px + env(safe-area-inset-top)) 18px 10px;display:flex;align-items:center;justify-content:space-between;background:var(--bg);flex-shrink:0;border-bottom:1px solid var(--border);}
+.topbar-title{font-size:17px;font-weight:700;letter-spacing:-0.02em;color:var(--ink);}
+.spill{background:var(--surface);border:1px solid var(--red-border);border-radius:var(--r-pill);padding:5px 11px;font-size:12px;font-weight:700;color:var(--red);cursor:pointer;white-space:nowrap;transition:background .15s;}
+.spill:active{background:var(--surface2);}
+.hdr-right{display:flex;align-items:center;gap:7px;}
+.ibtn{width:32px;height:32px;background:var(--surface);border:none;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;}
+.ibtn:active{background:var(--surface2);}
+
+/* ── NAV ── */
+.nav{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:rgba(255,255,255,0.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:100;}
+.nav.hidden{display:none;}
+.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:9px 4px 7px;border:none;background:none;cursor:pointer;position:relative;}
+.nbtn svg{stroke:var(--gray-light);stroke-width:1.6;transition:stroke .18s;}
+.nbtn span{font-size:10px;font-weight:600;color:var(--gray-light);font-family:var(--font);transition:color .18s;}
+.nbtn.active svg{stroke:var(--red);}
+.nbtn.active span{color:var(--red);}
+.nbtn.active::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:18px;height:2px;background:var(--red);border-radius:0 0 3px 3px;}
+
+/* ── BUTTONS ── */
+.btn{width:100%;padding:15px;border-radius:var(--r);font-family:var(--font);font-size:15px;font-weight:600;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:transform .18s var(--ease);letter-spacing:-.01em;}
+.btn:active{transform:scale(0.97);}
+.btn-red{background:var(--red);color:#fff;box-shadow:0 4px 14px rgba(139,21,26,0.22);}
+.btn-red:disabled{opacity:0.28;pointer-events:none;box-shadow:none;}
+.btn-surface{background:var(--surface);color:var(--ink);}
+.btn-surface:active{background:var(--surface2);}
+.btn-wa{background:#128C7E;color:#fff;}
+.btn-wa:active{background:#0d6e62;}
+.btn-dashed{background:transparent;border:1.5px dashed var(--surface2);color:var(--gray);}
+.btn-dashed:active{background:var(--surface);}
+.btn-green{background:var(--green);color:#fff;}
+
+/* ── PILLS ── */
+.pill-bar{display:flex;gap:6px;overflow-x:auto;padding:10px 18px 12px;flex-shrink:0;border-bottom:1px solid var(--border);background:var(--bg);}
+.pill{background:var(--surface);color:var(--gray);padding:8px 15px;border-radius:var(--r-pill);font-family:var(--font);font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.pill.active{background:var(--red);color:#fff;}
+
+/* ── FIXED CTA ── */
+.cta{flex-shrink:0;padding:10px 18px calc(72px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 40%);display:flex;flex-direction:column;gap:8px;}
+
+/* ── PRODUCT ROWS ── */
+.prow{display:flex;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);}
+.prow:last-child{border-bottom:none;}
+.prow-name{flex:1;font-size:14px;font-weight:500;color:var(--ink);padding-right:8px;line-height:1.3;}
+.stepper{display:flex;align-items:center;background:var(--surface);border-radius:9px;padding:2px;}
+.stbtn{width:30px;height:30px;border:none;background:transparent;font-size:18px;font-weight:400;color:var(--ink);cursor:pointer;border-radius:7px;display:flex;align-items:center;justify-content:center;transition:background .1s;}
+.stbtn:active{background:var(--bg);}
+.stval{width:30px;text-align:center;font-size:14px;font-weight:700;border:none;background:transparent;color:var(--ink);font-family:var(--font);}
+.stval::-webkit-outer-spin-button,.stval::-webkit-inner-spin-button{-webkit-appearance:none;}
+.abtn{width:30px;height:30px;border-radius:8px;border:1.5px solid var(--surface2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-left:6px;flex-shrink:0;transition:all .15s;}
+.abtn svg{stroke:var(--gray-light);}
+.abtn.act{background:var(--red-bg);border-color:var(--red-border);}
+.abtn.act svg{stroke:var(--red);}
+.prow.urg .prow-name{color:var(--red);}
+.prow.urg .stepper{background:var(--red-bg);}
+.prow.low .prow-name{color:#92400E;}
+
+/* ── CONTENT CARD ── */
+.ccard{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:4px 14px;box-shadow:var(--shadow);}
+
+/* ── SECTION LABEL ── */
+.slbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);}
+
+/* ── MSG BLOCK ── */
+.msg-block{background:var(--surface);border-radius:var(--r);overflow:hidden;}
+.msg-hdr{padding:9px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.msg-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);}
+.msg-hint{font-size:11px;color:var(--gray-light);}
+.msg-ta{width:100%;background:transparent;border:none;outline:none;padding:12px 13px;font-family:var(--font);font-size:13px;line-height:1.75;color:var(--ink);resize:none;min-height:100px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translateX(-50%) translateY(-6px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:var(--r-pill);font-size:13px;font-weight:600;opacity:0;transition:all .22s var(--ease);z-index:9999;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ════════════════════
+   LOGIN
+════════════════════ */
+.login-wrap{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+.login-hdr{padding:calc(32px + env(safe-area-inset-top)) 22px 22px;}
+.login-h{font-size:28px;font-weight:700;letter-spacing:-.035em;line-height:1.1;color:var(--ink);}
+.login-h em{color:var(--red);font-style:normal;}
+#login-step-users{display:flex;flex-direction:column;flex:1;}
+.ulist{padding:0 18px 24px;display:flex;flex-direction:column;gap:8px;}
+.urow{display:flex;align-items:center;gap:13px;background:var(--surface);border:1.5px solid transparent;border-radius:var(--r-lg);padding:13px 15px;cursor:pointer;transition:all .2s var(--ease);}
+.urow:active{transform:scale(.98);}
+.urow.sel{background:var(--red-bg);border-color:var(--red-border);}
+.uav{width:36px;height:36px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--gray);flex-shrink:0;transition:all .2s;}
+.urow.sel .uav{background:var(--red);color:#fff;}
+.uname{font-size:15px;font-weight:600;color:var(--ink);}
+.urow.sel .uname{color:var(--red);}
+
+#login-step-turno{position:absolute;top:0;left:0;right:0;bottom:0;background:var(--bg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .32s var(--ease);z-index:10;}
+#login-step-turno.show{transform:translateX(0);}
+.turno-body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 22px 40px;}
+.turno-for{font-size:13px;color:var(--gray);margin-bottom:4px;}
+.turno-name{font-size:26px;font-weight:700;letter-spacing:-.03em;color:var(--ink);margin-bottom:28px;}
+.turno-name em{color:var(--red);font-style:normal;}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;}
+.tcard{background:var(--surface);border:2px solid transparent;border-radius:var(--r-lg);padding:20px 12px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:all .2s var(--ease);}
+.tcard:active{transform:scale(.97);}
+.tcard.sel{border-color:var(--red);background:var(--red-bg);}
+.tbig{font-size:26px;font-weight:700;letter-spacing:-.02em;color:var(--ink);}
+.tcard.sel .tbig{color:var(--red);}
+.tsm{font-size:11px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;}
+.tback{background:none;border:none;font-family:var(--font);font-size:13px;font-weight:600;color:var(--gray);cursor:pointer;padding:10px 0;text-align:left;}
+
+/* ════════════════════
+   HOME
+════════════════════ */
+.home-scroll{flex:1;overflow-y:auto;padding-bottom:80px;}
+.sh{padding:14px 18px 8px;display:flex;align-items:center;justify-content:space-between;}
+.mod-list{padding:0 14px;display:flex;flex-direction:column;gap:9px;}
+.mc{background:var(--surface);border:1.5px solid var(--red-border);border-radius:var(--r-lg);padding:15px 15px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:all .16s var(--ease);}
+.mc:active{transform:scale(.985);background:var(--surface2);}
+.mc.locked{opacity:.4;cursor:default;}
+.mc.locked:active{transform:none;background:var(--surface);}
+.mc-title{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.01em;}
+.mc-desc{font-size:12px;color:var(--gray);margin-top:2px;}
+.mc-tag{background:var(--surface2);border-radius:5px;padding:3px 8px;font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;flex-shrink:0;margin-left:auto;}
+.mc-arr{flex-shrink:0;opacity:.18;margin-left:auto;}
+
+/* ════════════════════
+   INVENTARIO
+════════════════════ */
+.inv-wrap{padding:10px 18px 140px;}
+
+/* ════════════════════
+   RECEPCION — misma dinámica que inventario
+════════════════════ */
+/* search bar */
+.rec-search-wrap{padding:10px 18px 0;flex-shrink:0;position:relative;}
+.rec-search-input{width:100%;background:var(--surface);border:1.5px solid transparent;border-radius:10px;padding:10px 38px 10px 12px;font-family:var(--font);font-size:14px;font-weight:500;color:var(--ink);outline:none;transition:border-color .15s;}
+.rec-search-input:focus{border-color:var(--red);background:var(--bg);}
+.rec-search-input::placeholder{color:var(--gray-light);}
+.rec-search-icon{position:absolute;right:28px;top:50%;transform:translateY(-50%);pointer-events:none;}
+/* pill bar for rec categories */
+.rec-pill-bar{display:flex;gap:6px;overflow-x:auto;padding:10px 18px 12px;flex-shrink:0;border-bottom:1px solid var(--border);background:var(--bg);}
+.rec-pill-bar::-webkit-scrollbar{display:none;}
+/* product rows for recepcion — same as inv rows but with box toggle instead of alert */
+.rec-wrap{padding:10px 18px 160px;}
+/* box toggle pill: shows U or C, toggles mode */
+.box-toggle{flex-shrink:0;margin-left:6px;background:var(--surface2);border:none;border-radius:6px;padding:0 8px;height:30px;font-family:var(--font);font-size:11px;font-weight:700;color:var(--gray);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.box-toggle.caja{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green);}
+/* confirmed items section */
+.rec-done-section{border-top:1px solid var(--border);padding:10px 18px 0;flex-shrink:0;}
+.rec-done-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+.rec-done-scroll{flex:1;overflow-y:auto;min-height:0;padding:0 18px 160px;}
+.rec-entry{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+.rec-entry:last-child{border-bottom:none;}
+.rec-entry-name{flex:1;font-size:14px;font-weight:600;color:var(--ink);}
+.rec-entry-detail{font-size:12px;color:var(--gray);margin-top:1px;}
+.rec-entry-del{background:none;border:none;font-family:var(--font);font-size:16px;color:var(--gray-light);cursor:pointer;padding:4px 6px;flex-shrink:0;line-height:1;}
+.rec-empty-lbl{font-size:13px;color:var(--gray-light);padding:16px 0;text-align:center;}
+
+/* ════════════════════
+   PEDIDO
+════════════════════ */
+.ped-top{display:flex;align-items:center;gap:6px;padding:10px 18px 12px;flex-shrink:0;border-bottom:1px solid var(--border);background:var(--bg);}
+.ped-check{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--gray-light);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .2s var(--ease);}
+.ped-check svg{stroke:var(--gray-light);transition:stroke .2s;}
+.ped-check.done{background:var(--green-bg);border-color:var(--green-border);}
+.ped-check.done svg{stroke:var(--green);}
+.ped-check-lbl{font-size:11px;font-weight:600;color:var(--gray);margin-right:8px;}
+.ped-wrap{padding:10px 18px 160px;}
+.ped-cat{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);padding:12px 0 4px;}
+.ped-val{width:28px;text-align:center;font-size:14px;font-weight:700;color:var(--ink);}
+.ped-val.hi{color:var(--red);}
+
+/* ════════════════════
+   RESUMEN (shared)
+════════════════════ */
+.res-wrap{padding:14px 18px 140px;display:flex;flex-direction:column;gap:12px;}
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.stat-box{border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:3px;}
+.stat-box.red{background:var(--red-bg);border:1px solid var(--red-border);}
+.stat-box.amber{background:rgba(217,119,6,.06);border:1px solid rgba(217,119,6,.2);}
+.stat-num{font-size:36px;font-weight:700;line-height:1;letter-spacing:-.04em;}
+.stat-box.red .stat-num{color:var(--red);}
+.stat-box.amber .stat-num{color:#92400E;}
+.stat-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- ═══ NAV ═══ -->
+<nav class="nav hidden" id="main-nav">
+  <button class="nbtn active" id="nb-0" onclick="navHome()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>Inicio</span>
+  </button>
+  <button class="nbtn" id="nb-1" onclick="navInv()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/></svg>
+    <span>Inventario</span>
+  </button>
+  <button class="nbtn" id="nb-2" onclick="navRec()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><polyline points="16 3 12 7 8 3"/></svg>
+    <span>Recepción</span>
+  </button>
+  <button class="nbtn" id="nb-3" onclick="navPed()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <span>Pedido</span>
+  </button>
+</nav>
+
+<!-- ══════════════════════════════
+     LOGIN
+══════════════════════════════ -->
+<div class="screen active" id="sc-login" style="position:relative;">
+  <div id="login-step-users">
+    <div class="login-hdr">
+      <div class="login-h">¿Cuál es<br><em>tu nombre?</em></div>
+    </div>
+    <div class="login-wrap">
+      <div class="ulist" id="ulist"></div>
+    </div>
+  </div>
+  <div id="login-step-turno">
+    <div class="turno-body">
+      <div class="turno-for">Selecciona el turno para</div>
+      <div class="turno-name" id="turno-name">—</div>
+      <div class="tgrid">
+        <div class="tcard" data-t="mañana" onclick="selTurno(this)">
+          <span class="tbig">AM</span><span class="tsm">Mañana</span>
+        </div>
+        <div class="tcard" data-t="tarde" onclick="selTurno(this)">
+          <span class="tbig">PM</span><span class="tsm">Tarde</span>
+        </div>
+      </div>
+      <button class="btn btn-red" id="btn-entrar" disabled onclick="entrar()">Entrar</button>
+      <button class="tback" onclick="backUsers()">← Volver</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     HOME
+══════════════════════════════ -->
+<div class="screen" id="sc-home">
+  <div class="topbar">
+    <span class="topbar-title" style="color:var(--red);letter-spacing:.04em;">MAFIA</span>
+    <div class="spill" id="home-spill" onclick="mostrarMenuUsuario()">—</div>
+  </div>
+  <div class="home-scroll">
+    <div class="sh"><span class="slbl">Acciones rápidas</span></div>
+    <div class="mod-list">
+      <div class="mc" onclick="navInv()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+        <div><div class="mc-title">Inventario</div><div class="mc-desc">Conteo de stock de cocina</div></div>
+        <svg class="mc-arr" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="mc" onclick="navRec()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><polyline points="16 3 12 7 8 3"/></svg>
+        <div><div class="mc-title">Recepción</div><div class="mc-desc">Ingresar mercadería recibida</div></div>
+        <svg class="mc-arr" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="mc" onclick="navPed()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <div><div class="mc-title">Pedido sugerido</div><div class="mc-desc">Cocina y colación</div></div>
+        <svg class="mc-arr" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="mc locked" onclick="toast('Recetas próximamente')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8" opacity=".4"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <div><div class="mc-title">Recetas</div><div class="mc-desc">Consulta de recetas estándar</div></div>
+        <span class="mc-tag">Pronto</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     INVENTARIO
+══════════════════════════════ -->
+<div class="screen" id="sc-inv">
+  <div class="topbar">
+    <span class="topbar-title" style="color:var(--red);letter-spacing:.04em;">INVENTARIO</span>
+    <div class="hdr-right">
+      <div class="spill" id="inv-spill">—</div>
+      <button class="ibtn" onclick="reiniciarInv()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+      </button>
+    </div>
+  </div>
+  <!-- Buscador inventario -->
+  <div class="rec-search-wrap" style="padding-bottom:0;">
+    <input class="rec-search-input" type="text" id="inv-search" placeholder="Buscar producto..." oninput="filterInvProds(this.value)">
+    <svg class="rec-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gray-light)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  </div>
+  <div class="pill-bar" id="inv-pills"></div>
+  <div class="scroll">
+    <div class="inv-wrap"><div class="ccard" id="inv-list"></div></div>
+  </div>
+  <div class="cta">
+    <button class="btn btn-red" onclick="irResumenInv()">Ver resumen y enviar →</button>
+  </div>
+</div>
+
+<!-- RESUMEN INVENTARIO -->
+<div class="screen" id="sc-inv-res">
+  <div class="topbar">
+    <span class="topbar-title" style="color:var(--red);letter-spacing:.04em;">INVENTARIO</span>
+    <button class="ibtn" onclick="goTo('sc-inv');setNav(1);">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+  </div>
+  <div class="scroll">
+    <div class="res-wrap">
+      <div class="stat-row">
+        <div class="stat-box red"><div class="stat-num" id="surg">0</div><div class="stat-lbl">Urgentes</div></div>
+        <div class="stat-box amber"><div class="stat-num" id="sbajo">0</div><div class="stat-lbl">Stock</div></div>
+      </div>
+      <div class="msg-block">
+        <div class="msg-hdr"><span class="msg-lbl">Mensaje WhatsApp</span><span class="msg-hint">Editable</span></div>
+        <textarea class="msg-ta" id="pmsg-inv" rows="9"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="cta">
+    <button class="btn btn-red" onclick="enviarWA('pmsg-inv')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.121 1.532 5.849L.054 23.5l5.821-1.527A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.651-.507-5.173-1.392l-.371-.221-3.853 1.011 1.029-3.752-.242-.387A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+      Enviar
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     RECEPCION
+══════════════════════════════ -->
+<div class="screen" id="sc-rec">
+  <div class="topbar">
+    <span class="topbar-title" style="color:var(--red);letter-spacing:.04em;">RECEPCIÓN</span>
+    <div class="spill" id="rec-spill">—</div>
+  </div>
+  <!-- Buscador -->
+  <div class="rec-search-wrap">
+    <input class="rec-search-input" type="text" id="rec-search" placeholder="Buscar producto..." oninput="filterRecProds(this.value)">
+    <svg class="rec-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gray-light)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  </div>
+  <!-- Categorías -->
+  <div class="rec-pill-bar" id="rec-pills"></div>
+  <!-- Contenedor principal: scroll de productos arriba, done list abajo -->
+  <div style="flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;">
+    <div class="scroll" id="rec-prod-scroll" style="flex:1;min-height:0;">
+      <div class="rec-wrap"><div class="ccard" id="rec-prod-list"></div></div>
+    </div>
+    <!-- Items recepcionados: altura fija, siempre al fondo, nunca crece -->
+    <div id="rec-done-wrap" style="display:none;flex-direction:column;height:160px;border-top:2px solid var(--border);flex-shrink:0;background:var(--bg);">
+      <div style="padding:7px 18px 4px;flex-shrink:0;">
+        <span class="slbl" id="rec-done-count">Recepcionado (0)</span>
+      </div>
+      <div style="overflow-y:auto;flex:1;padding:0 18px 8px;" id="rec-done-list"></div>
+    </div>
+  </div>
+  <div class="cta">
+    <button class="btn btn-wa" onclick="enviarRecepcion()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.121 1.532 5.849L.054 23.5l5.821-1.527A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.651-.507-5.173-1.392l-.371-.221-3.853 1.011 1.029-3.752-.242-.387A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+      Enviar
+    </button>
+  </div>
+</div>
+
+<!-- PREVISUALIZAR RECEPCION -->
+<div class="screen" id="sc-rec-res">
+  <div class="topbar">
+    <span class="topbar-title" style="color:var(--red);letter-spacing:.04em;">RECEPCIÓN</span>
+    <button class="ibtn" onclick="goTo('sc-rec');setNav(2);">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+  </div>
+  <div class="scroll">
+    <div class="res-wrap">
+      <div class="msg-block">
+        <div class="msg-hdr"><span class="msg-lbl">Mensaje WhatsApp</span><span class="msg-hint">Editable</span></div>
+        <textarea class="msg-ta" id="pmsg-rec" rows="11"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="cta">
+    <button class="btn btn-wa" onclick="enviarWA('pmsg-rec')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.121 1.532 5.849L.054 23.5l5.821-1.527A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.651-.507-5.173-1.392l-.371-.221-3.853 1.011 1.029-3.752-.242-.387A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+      Enviar
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PEDIDO
+══════════════════════════════ -->
+<div class="screen" id="sc-ped">
+  <div class="topbar">
+    <span class="topbar-title" style="color:var(--red);letter-spacing:.04em;">PEDIDO</span>
+    <div class="spill" id="ped-spill">—</div>
+  </div>
+  <!-- Fila única: pills izq, buscador centro, contador+libreta der -->
+  <div class="ped-top" style="gap:7px;">
+    <button class="pill active" id="pt-cocina" onclick="switchPedTab('cocina',this)">Cocina</button>
+    <button class="pill" id="pt-colacion" onclick="switchPedTab('colacion',this)">Colación</button>
+    <!-- Buscador compacto -->
+    <div style="flex:1;position:relative;min-width:0;">
+      <input style="width:100%;background:var(--surface);border:1.5px solid transparent;border-radius:8px;padding:7px 28px 7px 10px;font-family:var(--font);font-size:13px;color:var(--ink);outline:none;" type="text" id="ped-search" placeholder="Buscar..." oninput="filterPedProds(this.value)">
+      <svg style="position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gray-light)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </div>
+    <!-- Contador -->
+    <div id="ped-counter" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:4px 9px;font-size:12px;font-weight:700;color:var(--gray);white-space:nowrap;flex-shrink:0;">0/2</div>
+    <!-- Revisar -->
+    <button class="ibtn" onclick="previsualizarPed()" title="Revisar pedido" style="flex-shrink:0;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    </button>
+  </div>
+  <div class="scroll">
+    <div class="ped-wrap"><div class="ccard" id="ped-list"></div></div>
+  </div>
+  <div class="cta">
+    <button class="btn btn-red" onclick="enviarPedido()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.121 1.532 5.849L.054 23.5l5.821-1.527A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.651-.507-5.173-1.392l-.371-.221-3.853 1.011 1.029-3.752-.242-.387A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+      Enviar
+    </button>
+  </div>
+</div>
+
+<!-- RESUMEN PEDIDO -->
+<div class="screen" id="sc-ped-res">
+  <div class="topbar">
+    <span class="topbar-title" style="color:var(--red);letter-spacing:.04em;">PEDIDO</span>
+    <button class="ibtn" onclick="goTo('sc-ped');setNav(3);">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+  </div>
+  <div class="scroll">
+    <div class="res-wrap">
+      <div class="msg-block">
+        <div class="msg-hdr"><span class="msg-lbl">Mensaje WhatsApp</span><span class="msg-hint">Editable</span></div>
+        <textarea class="msg-ta" id="pmsg-ped" rows="13"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="cta">
+    <button class="btn btn-wa" onclick="enviarWA('pmsg-ped')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.121 1.532 5.849L.054 23.5l5.821-1.527A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.651-.507-5.173-1.392l-.371-.221-3.853 1.011 1.029-3.752-.242-.387A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+      Enviar
+    </button>
+  </div>
+</div>
+
+<!-- MODAL CAMBIO USUARIO -->
+<div id="modal-usuario" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.35);align-items:flex-end;justify-content:center;">
+  <div style="background:var(--bg);border-radius:20px 20px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));width:100%;max-width:480px;">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin-bottom:14px;">Sesión activa</div>
+    <div id="modal-usuario-name" style="font-size:17px;font-weight:700;color:var(--ink);margin-bottom:18px;">—</div>
+    <button onclick="cambiarUsuario()" style="width:100%;padding:14px;border-radius:var(--r);border:1.5px solid var(--border);background:var(--surface);font-family:var(--font);font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;margin-bottom:8px;">Cambiar usuario</button>
+    <button onclick="cerrarModal()" style="width:100%;padding:14px;border-radius:var(--r);border:none;background:transparent;font-family:var(--font);font-size:15px;font-weight:600;color:var(--gray);cursor:pointer;">Cancelar</button>
+  </div>
+</div>
+
+<script>
+const USERS=['Blanca','Dana','Fabiola','Odalys','Valentina'];
+const DATA={
+  inv:{
+    'Proteínas':['Jamón','Pepperoni','Sobrecostilla','Pollo','Tocino'],
+    'Verduras':['Cebolla Blanca','Cebolla Morada','Aceitunas','Albahaca','Tomate','Lechuga','Champiñones','Apio','Pimentón','Cilantro','Perejil','Zanahoria','Zapallo italiano'],
+    'Quesos':['Cheddar','Fior di Latte','Parmesano','Mozzarella'],
+    'Salsas':['Salsa BBQ','Concentrado Pomodoro','Tomate Pelati'],
+    'Lácteos':['Leche','Crema','Aceite','Mantequilla'],
+    'Harinas':['Harina Pizza San Cristóbal','Harina Oro Uno','Levadura fresca','Sal','Azúcar'],
+    'Masas':['Masa 1250gr','Masa 625gr']
+  },
+  ped:{
+    cocina:{
+      'Proteínas':['Jamón','Pepperoni','Sobrecostilla','Pollo','Tocino'],
+      'Verduras':['Cebolla Blanca','Cebolla Morada','Aceitunas','Albahaca','Tomate','Ajo','Apio','Zanahoria','Zapallo italiano','Champiñones','Cilantro','Perejil'],
+      'Quesos':['Cheddar','Fior di Latte','Parmesano','Mozzarella'],
+      'Salsas':['Salsa BBQ','Concentrado Pomodoro','Tomate Pelati'],
+      'Lácteos':['Leche','Crema','Mantequilla','Aceite'],
+      'Harinas':['Harina Pizza San Cristóbal','Harina Oro Uno','Levadura fresca','Sal','Azúcar']
+    },
+    colacion:{
+      'Proteínas':['Truto corto','Chuletas','Vienesas','Longanizas','Huevo'],
+      'Verduras':['Cebolla Blanca','Tomate','Choclo','Lechuga','Zanahoria','Zapallo italiano','Apio','Champiñones','Cilantro','Perejil'],
+      'Lácteos':['Leche','Mantequilla','Aceite'],
+      'Otros':['Arroz','Fideos','Sal','Azúcar','Lentejas','Puré','Atún']
+    }
+  },
+  rec:{
+    'Proteínas':['Jamón','Pepperoni','Sobrecostilla','Pollo (kg)','Tocino','Chuletas','Truto corto','Huevos','Vienesas','Longanizas'],
+    'Verduras':['Cebolla Blanca','Cebolla Morada','Tomate','Aceitunas','Albahaca','Lechuga','Champiñones','Apio','Pimentón','Cilantro','Perejil','Zanahoria','Zapallo italiano'],
+    'Lácteos':['Cheddar','Fior di Latte','Parmesano','Mozzarella','Leche','Crema','Mantequilla'],
+    'Despensa':['Arroz','Fideos','Aceite','Sal','Azúcar','Lentejas','Puré','Atún','Salsa BBQ','Concentrado Pomodoro','Tomate Pelati'],
+    'Harinas':['Harina Pizza San Cristóbal','Harina Oro Uno','Levadura fresca','Fortaleza Normal','Fortaleza Plus','Masa 1250gr','Masa 625gr'],
+    'Otro':['Otro']
+  }
+};
+
+const slug=s=>s.toLowerCase().replace(/[^a-z0-9]/g,'_');
+const DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+function fLarga(){const d=new Date();return`${DIAS[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()]}`;}
+function fCorta(){const d=new Date();return`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;}
+function pillTxt(){return`${fCorta()} ${S.t==='mañana'?'AM':'PM'} · ${S.u}`;}
+
+let S={u:null,t:null,inv:{},pedC:{},pedCol:{}};
+let _pedDone={cocina:false,colacion:false};
+/* rec state managed via _recState */
+let _recState={};
+
+/* ── NAV ── */
+function goTo(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function setNav(i){document.querySelectorAll('.nbtn').forEach((b,n)=>b.classList.toggle('active',n===i));}
+function showNav(v){document.getElementById('main-nav').classList.toggle('hidden',!v);}
+function navHome(){goTo('sc-home');setNav(0);showNav(true);}
+function navInv(){iniciarInv();goTo('sc-inv');setNav(1);showNav(true);}
+function navRec(){iniciarRec();goTo('sc-rec');setNav(2);showNav(true);}
+function navPed(){iniciarPed();goTo('sc-ped');setNav(3);showNav(true);}
+function setSpills(){const t=pillTxt();['home','inv','rec','ped'].forEach(id=>{const el=document.getElementById(id+'-spill');if(el)el.textContent=t;});}
+
+/* ── LOGIN ── */
+(function buildUsers(){
+  const ul=document.getElementById('ulist');
+  USERS.forEach(u=>{
+    const r=document.createElement('div');r.className='urow';
+    r.innerHTML=`<div class="uav">${u[0]}</div><span class="uname">${u}</span>`;
+    r.onclick=()=>selectUser(u,r);
+    ul.appendChild(r);
+  });
+
+})();
+
+function selectUser(u,row){
+  document.querySelectorAll('.urow').forEach(r=>r.classList.remove('sel'));
+  row.classList.add('sel');S.u=u;
+  setTimeout(()=>{
+    document.getElementById('turno-name').innerHTML=`<em>${u}</em>`;
+    document.getElementById('login-step-turno').classList.add('show');
+    document.getElementById('btn-entrar').disabled=true;
+    document.querySelectorAll('.tcard').forEach(c=>c.classList.remove('sel'));
+    S.t=null;
+  },100);
+}
+function backUsers(){document.getElementById('login-step-turno').classList.remove('show');S.t=null;S.u=null;document.querySelectorAll('.urow').forEach(r=>r.classList.remove('sel'));}
+function selTurno(card){document.querySelectorAll('.tcard').forEach(c=>c.classList.remove('sel'));card.classList.add('sel');S.t=card.dataset.t;document.getElementById('btn-entrar').disabled=false;}
+function entrar(){if(!S.u||!S.t)return;setSpills();navHome();document.getElementById('login-step-turno').classList.remove('show');document.querySelectorAll('.urow,.tcard').forEach(e=>e.classList.remove('sel'));}
+function mostrarMenuUsuario(){
+  document.getElementById('modal-usuario-name').textContent=S.u+' · Turno '+(S.t==='mañana'?'AM':'PM');
+  document.getElementById('modal-usuario').style.display='flex';
+}
+function cerrarModal(){document.getElementById('modal-usuario').style.display='none';}
+function cambiarUsuario(){cerrarModal();S={u:null,t:null,inv:{},pedC:{},pedCol:{}};showNav(false);goTo('sc-login');}
+function cerrarSesion(){cambiarUsuario();}
+
+/* ── INVENTARIO ── */
+const INV_CATS=Object.keys(DATA.inv);
+function iniciarInv(){
+  S.inv={};
+  INV_CATS.forEach(cat=>DATA.inv[cat].forEach(p=>{S.inv[slug(p)]={n:p,q:0,u:false};}));
+  buildInvPills();
+  const firstPill=document.querySelector('#inv-pills .pill');
+  switchInvTab(INV_CATS[0],firstPill);
+  document.getElementById('inv-search').value='';
+}
+function buildInvPills(){
+  const bar=document.getElementById('inv-pills');bar.innerHTML='';
+  INV_CATS.forEach((cat,i)=>{
+    const b=document.createElement('button');b.className='pill'+(i===0?' active':'');b.textContent=cat;
+    b.onclick=()=>switchInvTab(cat,b);bar.appendChild(b);
+  });
+}
+function switchInvTab(cat,btn){
+  document.querySelectorAll('#inv-pills .pill').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.getElementById('inv-search').value='';
+  renderInvList(DATA.inv[cat]);
+  document.querySelector('#sc-inv .scroll').scrollTop=0;
+}
+function filterInvProds(q){
+  if(!q.trim()){
+    // restore active tab
+    const active=document.querySelector('#inv-pills .pill.active');
+    const cat=active?active.textContent:INV_CATS[0];
+    renderInvList(DATA.inv[cat]);
+    return;
+  }
+  const all=[];
+  INV_CATS.forEach(cat=>DATA.inv[cat].forEach(p=>{if(p.toLowerCase().includes(q.toLowerCase()))all.push(p);}));
+  renderInvList(all);
+  document.querySelectorAll('#inv-pills .pill').forEach(b=>b.classList.remove('active'));
+  document.querySelector('#sc-inv .scroll').scrollTop=0;
+}
+function renderInvList(prods){
+  const list=document.getElementById('inv-list');list.innerHTML='';
+  (Array.isArray(prods)?prods:DATA.inv[prods]).forEach(p=>{
+    const id=slug(p);const it=S.inv[id];
+    const row=document.createElement('div');row.className='prow';row.id='row-'+id;
+    row.innerHTML=`<span class="prow-name">${p}</span>
+      <div class="stepper">
+        <button class="stbtn" onclick="chQ('${id}',-1)">−</button>
+        <input type="number" class="stval" id="q-${id}" value="${it.q}" onchange="setQ('${id}',this.value)" onclick="this.select()" inputmode="numeric">
+        <button class="stbtn" onclick="chQ('${id}',1)">+</button>
+      </div>
+      <button class="abtn${it.u?' act':''}" id="u-${id}" onclick="togU('${id}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </button>`;
+    list.appendChild(row);updRow(id);
+  });
+}
+function chQ(id,d){S.inv[id].q=Math.max(0,S.inv[id].q+d);document.getElementById('q-'+id).value=S.inv[id].q;updRow(id);}
+function setQ(id,v){S.inv[id].q=Math.max(0,parseInt(v)||0);updRow(id);}
+function togU(id){S.inv[id].u=!S.inv[id].u;document.getElementById('u-'+id).classList.toggle('act',S.inv[id].u);updRow(id);}
+function updRow(id){
+  const row=document.getElementById('row-'+id);if(!row)return;
+  const it=S.inv[id];row.classList.remove('urg','low');
+  if(it.u)row.classList.add('urg');else if(it.q>0&&it.q<3)row.classList.add('low');
+}
+function reiniciarInv(){if(!confirm('¿Reiniciar inventario?'))return;iniciarInv();}
+function irResumenInv(){
+  const urg=[],low=[],cero=[];
+  Object.values(S.inv).forEach(it=>{
+    if(it.u)urg.push(it);
+    else if(it.q===0)cero.push(it);
+    else if(it.q>0&&it.q<3)low.push(it);
+  });
+  document.getElementById('surg').textContent=urg.length;
+  document.getElementById('sbajo').textContent=low.length+cero.length;
+  let msg=`*INVENTARIO — MAFIA*\n${S.u} · ${S.t==='mañana'?'AM':'PM'} · ${fLarga()}\n\n`;
+  if(urg.length){msg+='*⚠️ URGENTE*\n';urg.forEach(x=>msg+=`• ${x.n}: ${x.q}\n`);msg+='\n';}
+  if(cero.length){msg+='*86 (SIN STOCK)*\n';cero.forEach(x=>msg+=`• ${x.n}\n`);msg+='\n';}
+  if(low.length){msg+='*🟡 STOCK BAJO*\n';low.forEach(x=>msg+=`• ${x.n}: ${x.q}\n`);msg+='\n';}
+  if(!urg.length&&!cero.length&&!low.length){msg+='✅ Todo el inventario en orden.';}
+  else{msg+='✅ El resto en orden.';}
+  document.getElementById('pmsg-inv').value=msg;
+  goTo('sc-inv-res');setNav(1);
+}
+
+/* ── RECEPCION ── */
+const REC_CATS=Object.keys(DATA.rec);
+let _recCatActive=REC_CATS[0];
+/* {slug:{n,q,modo}} — modo: 'u'|'c' */
+
+function iniciarRec(){
+  _recState={};
+  REC_CATS.forEach(cat=>DATA.rec[cat].forEach(p=>{_recState[slug(p)]={n:p,q:0,modo:'u'};}));
+  buildRecPills();switchRecCat(REC_CATS[0],document.querySelector('#rec-pills .pill'));
+  document.getElementById('rec-search').value='';
+  renderRecDone();
+}
+
+function buildRecPills(){
+  const bar=document.getElementById('rec-pills');bar.innerHTML='';
+  REC_CATS.forEach((cat,i)=>{
+    const b=document.createElement('button');b.className='pill'+(i===0?' active':'');
+    b.textContent=cat;b.onclick=()=>switchRecCat(cat,b);bar.appendChild(b);
+  });
+}
+function switchRecCat(cat,btn){
+  _recCatActive=cat;
+  document.querySelectorAll('#rec-pills .pill').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.getElementById('rec-search').value='';
+  renderRecProdList(DATA.rec[cat].map(p=>slug(p)));
+  document.getElementById('rec-prod-scroll').scrollTop=0;
+}
+function filterRecProds(q){
+  if(!q.trim()){switchRecCat(_recCatActive,null);return;}
+  /* search all cats */
+  const matches=[];
+  REC_CATS.forEach(cat=>DATA.rec[cat].forEach(p=>{if(p.toLowerCase().includes(q.toLowerCase()))matches.push(slug(p));}));
+  renderRecProdList(matches);
+  document.querySelectorAll('#rec-pills .pill').forEach(b=>b.classList.remove('active'));
+}
+function renderRecProdList(ids){
+  const list=document.getElementById('rec-prod-list');list.innerHTML='';
+  if(!ids.length){list.innerHTML='<div style="padding:20px;text-align:center;font-size:13px;color:var(--gray-light);">Sin resultados</div>';return;}
+  ids.forEach(id=>{
+    const it=_recState[id];if(!it)return;
+    const row=document.createElement('div');row.className='prow';row.id='rrow-'+id;
+    const isCaja=it.modo==='c';
+    row.innerHTML=`<span class="prow-name">${it.n}</span>
+      <div class="stepper">
+        <button class="stbtn" onclick="chRec('${id}',-1)">−</button>
+        <input type="number" class="stval" id="rq-${id}" value="${it.q}" onchange="setRec('${id}',this.value)" onclick="this.select()" inputmode="numeric">
+        <button class="stbtn" onclick="chRec('${id}',1)">+</button>
+      </div>
+      <button class="box-toggle${isCaja?' caja':''}" id="rb-${id}" onclick="togRecModo('${id}')">${isCaja?'Caja':'Unid'}</button>`;
+    list.appendChild(row);
+    updRecRow(id);
+  });
+}
+function chRec(id,d){_recState[id].q=Math.max(0,_recState[id].q+d);document.getElementById('rq-'+id).value=_recState[id].q;updRecRow(id);}
+function setRec(id,v){_recState[id].q=Math.max(0,parseInt(v)||0);updRecRow(id);}
+function togRecModo(id){
+  _recState[id].modo=_recState[id].modo==='u'?'c':'u';
+  const btn=document.getElementById('rb-'+id);
+  const isCaja=_recState[id].modo==='c';
+  btn.textContent=isCaja?'Caja':'Unid';
+  btn.classList.toggle('caja',isCaja);
+  updRecRow(id);
+}
+function updRecRow(id){
+  const row=document.getElementById('rrow-'+id);if(!row)return;
+  const it=_recState[id];
+  row.style.opacity=it.q>0?'1':'0.7';
+  renderRecDone();
+}
+function renderRecDone(){
+  const items=Object.values(_recState).filter(i=>i.q>0);
+  const wrap=document.getElementById('rec-done-wrap');
+  const list=document.getElementById('rec-done-list');
+  const lbl=document.getElementById('rec-done-count');
+  wrap.style.display=items.length?'flex':'none';
+  if(!items.length)return;
+  lbl.textContent=`Recepcionado (${items.length})`;
+  list.innerHTML='';
+  items.forEach(item=>{
+    const el=document.createElement('div');el.className='rec-entry';
+    const detail=item.modo==='c'?`${item.q} caja${item.q!==1?'s':''}`:`${item.q} unid.`;
+    el.innerHTML=`<div style="flex:1"><div class="rec-entry-name">${item.n}</div><div class="rec-entry-detail">${detail}</div></div>
+      <button class="rec-entry-del" onclick="clearRecItem('${slug(item.n)}')">×</button>`;
+    list.appendChild(el);
+  });
+}
+function clearRecItem(id){_recState[id].q=0;const el=document.getElementById('rq-'+id);if(el)el.value=0;updRecRow(id);}
+function enviarRecepcion(){
+  const items=Object.values(_recState).filter(i=>i.q>0);
+  if(!items.length){toast('Agrega al menos un producto');return;}
+  let msg=`*RECEPCIÓN — MAFIA*\n${S.u} · ${S.t==='mañana'?'AM':'PM'} · ${fLarga()}\n\n`;
+  items.forEach(item=>{
+    const det=item.modo==='c'?`${item.q} caja${item.q!==1?'s':''}`:`${item.q} unid.`;
+    msg+=`• ${item.n}: ${det}\n`;
+  });
+  msg+='\nRecepción registrada.';
+  document.getElementById('pmsg-rec').value=msg;
+  goTo('sc-rec-res');setNav(2);
+}
+
+/* ── PEDIDO ── */
+function iniciarPed(){
+  S.pedC={};S.pedCol={};_pedDone={cocina:false,colacion:false};
+  Object.values(DATA.ped.cocina).forEach(arr=>arr.forEach(p=>{S.pedC[slug(p)]={n:p,q:0};}));
+  Object.values(DATA.ped.colacion).forEach(arr=>arr.forEach(p=>{S.pedCol[slug(p)]={n:p,q:0};}));
+  updPedCounter();
+  const ps=document.getElementById('ped-search');if(ps)ps.value='';
+  switchPedTab('cocina',document.getElementById('pt-cocina'));
+}
+function switchPedTab(tipo,btn){
+  document.querySelectorAll('#sc-ped .pill').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const si=document.getElementById('ped-search');if(si)si.value='';
+  renderPedList(tipo);
+  document.querySelector('#sc-ped .scroll').scrollTop=0;
+}
+function filterPedProds(q){
+  const activePill=document.querySelector('#sc-ped .pill.active');
+  const tipo=activePill&&activePill.id==='pt-colacion'?'colacion':'cocina';
+  if(!q.trim()){renderPedList(tipo);return;}
+  const cats=DATA.ped[tipo];
+  const store=tipo==='cocina'?S.pedC:S.pedCol;
+  const list=document.getElementById('ped-list');list.innerHTML='';
+  const grp=document.createElement('div');
+  Object.keys(cats).forEach(cat=>{
+    cats[cat].forEach(p=>{
+      if(!p.toLowerCase().includes(q.toLowerCase()))return;
+      const id=slug(p);const row=document.createElement('div');row.className='prow';
+      row.innerHTML=`<span class="prow-name">${p}</span>
+        <div class="stepper">
+          <button class="stbtn" onclick="chPed('${tipo}','${id}',-1)">−</button>
+          <span class="ped-val${store[id]&&store[id].q>0?' hi':''}" id="pv-${tipo}-${id}">${store[id]?store[id].q:0}</span>
+          <button class="stbtn" onclick="chPed('${tipo}','${id}',1)">+</button>
+        </div>`;
+      grp.appendChild(row);
+    });
+  });
+  list.appendChild(grp);
+}
+function renderPedList(tipo){
+  const list=document.getElementById('ped-list');list.innerHTML='';
+  const cats=DATA.ped[tipo];const store=tipo==='cocina'?S.pedC:S.pedCol;
+  Object.keys(cats).forEach(cat=>{
+    const grp=document.createElement('div');
+    grp.innerHTML=`<div class="ped-cat">${cat}</div>`;
+    cats[cat].forEach(p=>{
+      const id=slug(p);const row=document.createElement('div');row.className='prow';
+      row.innerHTML=`<span class="prow-name">${p}</span>
+        <div class="stepper">
+          <button class="stbtn" onclick="chPed('${tipo}','${id}',-1)">−</button>
+          <span class="ped-val${store[id]&&store[id].q>0?' hi':''}" id="pv-${tipo}-${id}">${store[id]?store[id].q:0}</span>
+          <button class="stbtn" onclick="chPed('${tipo}','${id}',1)">+</button>
+        </div>`;
+      grp.appendChild(row);
+    });
+    list.appendChild(grp);
+  });
+}
+function chPed(tipo,id,d){
+  const store=tipo==='cocina'?S.pedC:S.pedCol;
+  store[id].q=Math.max(0,store[id].q+d);
+  const el=document.getElementById(`pv-${tipo}-${id}`);
+  if(el){el.textContent=store[id].q;el.className='ped-val'+(store[id].q>0?' hi':'');}
+}
+/* Construye msg por tipo con categorías SIN guiones bajos */
+function buildPedMsg(tipo){
+  const cats=DATA.ped[tipo];
+  const store=tipo==='cocina'?S.pedC:S.pedCol;
+  const label=tipo==='cocina'?'COCINA':'COLACIÓN';
+  let lines=[`*PEDIDO ${label} — MAFIA*`,`${S.u} · ${fLarga()}`,''];
+  let total=0;
+  Object.keys(cats).forEach(cat=>{
+    const items=cats[cat].filter(p=>{const id=slug(p);return store[id]&&store[id].q>0;});
+    if(items.length){
+      lines.push(`*${cat.toUpperCase()}*`);
+      items.forEach(p=>{const id=slug(p);lines.push(`• ${p}: ${store[id].q}`);});
+      lines.push('');
+      total+=items.length;
+    }
+  });
+  return total>0?lines.join('\n'):null;
+}
+function marcarListo(tipo){
+  _pedDone[tipo]=!_pedDone[tipo];
+  updPedCounter();
+}
+function updPedCounter(){
+  const n=(_pedDone.cocina?1:0)+(_pedDone.colacion?1:0);
+  const el=document.getElementById('ped-counter');
+  el.textContent=n+'/2';
+  el.style.background=n>0?'var(--green-bg)':'var(--surface)';
+  el.style.borderColor=n>0?'var(--green-border)':'var(--border)';
+  el.style.color=n>0?'var(--green)':'var(--gray)';
+}
+function enviarPedido(){
+  const cocMsg=buildPedMsg('cocina');
+  const colMsg=buildPedMsg('colacion');
+  if(!cocMsg&&!colMsg){toast('Agrega cantidades primero');return;}
+  /* Enviar los que tengan items; si hay dos, abrir ambos con pequeño delay */
+  if(cocMsg){window.open(`https://wa.me/?text=${encodeURIComponent(cocMsg)}`,'_blank');}
+  if(colMsg){setTimeout(()=>window.open(`https://wa.me/?text=${encodeURIComponent(colMsg)}`,'_blank'),400);}
+  if(cocMsg){_pedDone.cocina=true;}
+  if(colMsg){_pedDone.colacion=true;}
+  updPedCounter();
+  toast('Pedido enviado');
+}
+function previsualizarPed(){
+  let all='';
+  ['cocina','colacion'].forEach(tipo=>{
+    const m=buildPedMsg(tipo);
+    if(m)all+=m+'\n\n';
+  });
+  if(!all.trim()){toast('Agrega cantidades primero');return;}
+  document.getElementById('pmsg-ped').value=all.trim();
+  goTo('sc-ped-res');setNav(3);
+}
+
+/* ── WA ── */
+function enviarWA(elId){
+  const el=document.getElementById(elId);
+  const msg=el.tagName==='TEXTAREA'?el.value:el.textContent;
+  if(!msg.trim()){toast('El mensaje está vacío');return;}
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+/* ── TOAST ── */
+let _tt=null;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');if(_tt)clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2500);}
+</script>
+</body>
+</html>
