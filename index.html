@@ -509,7 +509,7 @@ document.getElementById('home-spill').onclick=()=>{document.getElementById('mu-n
 /* ── INVENTARIO ── */
 function iniciarInv(){
   S.inv={};
-  PRODS.forEach(p=>{S.inv[p.id]={...p,q:0,modo:'u'};});
+  PRODS.forEach(p=>{S.inv[p.id]={...p,q:0};});
   buildInvPills();
   const firstPill=document.querySelector('#inv-pills .pill');
   switchInvTab(INV_CATS[0],firstPill);
@@ -540,11 +540,6 @@ function renderInvList(prods){
   prods.forEach(p=>{
     const it=S.inv[p.id];
     if(!it)return;
-    const isBebida=p.cat==='Bebidas';
-    const fixedLbl=p.unit==='sixpack'?'Sixpack':'UNID';
-    const rightInv=isBebida
-      ?`<span class="unit-lbl">${fixedLbl}</span>`
-      :`<button class="box-toggle${it.modo==='c'?' caja':''}" id="ibt-${p.id}" onclick="togInvModo('${p.id}')">${it.modo==='c'?'CAJA':'UNID'}</button>`;
     const row=document.createElement('div');row.className='prow';row.id='inv-row-'+p.id;
     row.innerHTML=`
       <div class="prow-info">
@@ -554,8 +549,7 @@ function renderInvList(prods){
         <button class="stbtn" onclick="chInv('${p.id}',-1)">−</button>
         <input type="number" class="stval" id="iq-${p.id}" value="${it.q}" style="color:${it.q>0?'var(--red)':'var(--ink)'}" onchange="setInv('${p.id}',this.value)" onclick="this.select()" inputmode="numeric">
         <button class="stbtn" onclick="chInv('${p.id}',1)">+</button>
-      </div>
-      ${rightInv}`;
+      </div>`;
     list.appendChild(row);
     updInvRow(p.id);
   });
@@ -569,16 +563,7 @@ function renderInvList(prods){
   </button>`;
   list.appendChild(addInvRow);
 }
-function togInvModo(id){
-  S.inv[id].modo=S.inv[id].modo==='u'?'c':'u';
-  const btn=document.getElementById('ibt-'+id);
-  if(btn){
-    const isCaja=S.inv[id].modo==='c';
-    const p=PRODS.find(x=>x.id===id);
-    btn.textContent=isCaja?'CAJA':'UNID';
-    btn.classList.toggle('caja',isCaja);
-  }
-}
+
 function chInv(id,d){S.inv[id].q=Math.max(0,S.inv[id].q+d);const el=document.getElementById('iq-'+id);if(el){el.value=S.inv[id].q;el.style.color=S.inv[id].q>0?'var(--red)':'var(--ink)';}updInvRow(id);}
 function setInv(id,v){S.inv[id].q=Math.max(0,parseInt(v)||0);const el=document.getElementById('iq-'+id);if(el)el.style.color=S.inv[id].q>0?'var(--red)':'var(--ink)';updInvRow(id);}
 function updInvRow(id){
