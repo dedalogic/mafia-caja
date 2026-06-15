@@ -570,6 +570,24 @@ function updInvRow(id){
   const row=document.getElementById('inv-row-'+id);if(!row)return;
   row.style.opacity='1';
 }
+function irResumenInv(){
+  const cero=[],bajo=[];
+  PRODS.forEach(p=>{
+    const q=S.inv[p.id]?S.inv[p.id].q:0;
+    if(q===0)cero.push(p);
+    else if(q<3)bajo.push(p);
+  });
+  document.getElementById('surg').textContent=cero.length;
+  document.getElementById('sbajo').textContent=bajo.length;
+  const turno=S.t==='mañana'?'AM':'PM';
+  let msg='*INVENTARIO CAJA — MAFIA*\n'+S.u+' · '+turno+' · '+fLarga()+'\n\n';
+  if(cero.length){msg+='*86 (SIN STOCK)*\n';cero.forEach(p=>{msg+='• '+p.name+'\n';});msg+='\n';}
+  if(bajo.length){msg+='*STOCK BAJO*\n';bajo.forEach(p=>{msg+='• '+p.name+': '+S.inv[p.id].q+'\n';});msg+='\n';}
+  if(!cero.length&&!bajo.length)msg+='Todo el stock en orden.';
+  else msg+='El resto en orden.';
+  document.getElementById('pmsg-inv').value=msg;
+  goTo('sc-inv-res');setNav(1);
+}
 function reiniciarInv(){if(!confirm('¿Reiniciar inventario?'))return;iniciarInv();}
 
 function chPed(id,d){
