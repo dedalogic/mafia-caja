@@ -28,7 +28,7 @@
   --ease:cubic-bezier(0.22,0.8,0.22,1);
   --r:14px;--r-lg:18px;--r-pill:100px;
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--ink);max-width:480px;margin:0 auto;overflow:hidden;-webkit-font-smoothing:antialiased;}
 ::-webkit-scrollbar{display:none;}
 .screen{display:none;flex-direction:column;height:100dvh;overflow:hidden;}
@@ -553,7 +553,7 @@ function renderInvList(prods){
       </div>
       <div class="stepper">
         <button class="stbtn" onclick="chInv('${p.id}',-1)">−</button>
-        <input type="number" class="stval" id="iq-${p.id}" value="${it.q}" onchange="setInv('${p.id}',this.value)" onclick="this.select()" inputmode="numeric">
+        <input type="number" class="stval" id="iq-${p.id}" value="${it.q}" style="color:${it.q>0?'var(--red)':'var(--ink)'}" onchange="setInv('${p.id}',this.value)" onclick="this.select()" inputmode="numeric">
         <button class="stbtn" onclick="chInv('${p.id}',1)">+</button>
       </div>
       ${rightInv}`;
@@ -571,8 +571,8 @@ function togInvModo(id){
     btn.classList.toggle('caja',isCaja);
   }
 }
-function chInv(id,d){S.inv[id].q=Math.max(0,S.inv[id].q+d);const el=document.getElementById('iq-'+id);if(el)el.value=S.inv[id].q;updInvRow(id);}
-function setInv(id,v){S.inv[id].q=Math.max(0,parseInt(v)||0);updInvRow(id);}
+function chInv(id,d){S.inv[id].q=Math.max(0,S.inv[id].q+d);const el=document.getElementById('iq-'+id);if(el){el.value=S.inv[id].q;el.style.color=S.inv[id].q>0?'var(--red)':'var(--ink)';}updInvRow(id);}
+function setInv(id,v){S.inv[id].q=Math.max(0,parseInt(v)||0);const el=document.getElementById('iq-'+id);if(el)el.style.color=S.inv[id].q>0?'var(--red)':'var(--ink)';updInvRow(id);}
 function updInvRow(id){
   const row=document.getElementById('inv-row-'+id);if(!row)return;
   row.style.opacity='1';
@@ -635,7 +635,7 @@ function renderPedList(cat){
     row.innerHTML=`
       <div class="prow-info">
         <div class="prow-name">${p.name}</div>
-        <div class="prow-sub" style="color:var(--red);font-weight:600;">${p.prov}</div>
+
       </div>
       <div class="stepper">
         <button class="stbtn" onclick="chPed('${p.id}',-1)">−</button>
@@ -666,9 +666,9 @@ function _buildPedMsgByProv(){
   const byProv={};
   PRODS.forEach(p=>{
     const ps=S.ped[p.id];if(!ps||ps.q===0)return;
-    if(!byProv[p.prov])byProv[p.prov]=[];
+    if(!byProv[p.cat])byProv[p.cat]=[];
     const modoLbl=p.cat==='Bebidas'?(p.unit==='sixpack'?'6-PACK':'UNID'):(ps.modo==='c'?'CAJA':'UNID');
-    byProv[p.prov].push(`• ${p.name}: ${ps.q} ${modoLbl}`);
+    byProv[p.cat].push(`• ${p.name}: ${ps.q} ${modoLbl}`);
   });
   return byProv;
 }
@@ -678,7 +678,7 @@ function enviarPedido(){
   if(!provs.length){toast('Agrega cantidades primero');return;}
   provs.forEach((prov,i)=>{
     const msg=`*PEDIDO ${prov.toUpperCase()} — MAFIA*\n${S.u} · ${fLarga()}\n\n${byProv[prov].join('\n')}`;
-    setTimeout(()=>window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank'),i*450);
+    setTimeout(()=>abrirWA(msg),i*500);
   });
   updPedCounter();
   toast(`${provs.length} pedido${provs.length>1?'s':''} enviado${provs.length>1?'s':''}`);
@@ -742,7 +742,7 @@ function filterPed(q){
     row.innerHTML=`
       <div class="prow-info">
         <div class="prow-name">${p.name}</div>
-        <div class="prow-sub" style="color:var(--red);font-weight:600;">${p.prov}</div>
+
       </div>
       <div class="stepper">
         <button class="stbtn" onclick="chPed('${p.id}',-1)">−</button>
@@ -754,11 +754,16 @@ function filterPed(q){
   });
   document.querySelectorAll('#ped-pills .pill').forEach(b=>b.classList.remove('active'));
 }
+function abrirWA(msg){
+  if(!msg||!msg.trim()){toast('El mensaje está vacío');return;}
+  const encoded=encodeURIComponent(msg);
+  window.location.href='whatsapp://send?text='+encoded;
+  setTimeout(()=>{window.open('https://api.whatsapp.com/send?text='+encoded,'_blank');},1200);
+}
 function enviarWA(elId){
   const el=document.getElementById(elId);
   const msg=el.tagName==='TEXTAREA'?el.value:el.textContent;
-  if(!msg.trim()){toast('El mensaje está vacío');return;}
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+  abrirWA(msg);
 }
 
 /* ── TOAST ── */
