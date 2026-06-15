@@ -925,11 +925,20 @@ function guardarInvHist(){
   toast('Guardado en historial');
 }
 function exportarInv(){
-  var csv='Producto,Categoría,Proveedor,Unidad,Stock\n';
+  /* Usar punto y coma como separador (estándar Excel en español/latinoamérica) */
+  /* BOM UTF-8 para que Excel abra con tildes correctas */
+  var BOM='\uFEFF';
+  var SEP=';';
+  var esc=function(v){return '"'+String(v).replace(/"/g,'""')+'"';};
+  var rows=[
+    ['Producto','Categoría','Proveedor','Unidad de pedido','Stock'].join(SEP)
+  ];
   PRODS.forEach(function(p){
     var q=S.inv[p.id]?S.inv[p.id].q:0;
-    csv+='"'+p.name+'","'+p.cat+'","'+p.prov+'","'+p.unit+'",'+q+'\n';
+    var unitLbl=p.unit==='sixpack'?'Sixpack':p.unit.charAt(0).toUpperCase()+p.unit.slice(1);
+    rows.push([esc(p.name),esc(p.cat),esc(p.prov),esc(unitLbl),q].join(SEP));
   });
+  var csv=BOM+rows.join('\r\n');
   var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
