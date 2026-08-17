@@ -185,6 +185,17 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--i
 .box-toggle{flex-shrink:0;margin-left:6px;background:var(--surface2);border:none;border-radius:6px;padding:0;width:46px;height:30px;font-family:var(--font);font-size:11px;font-weight:700;color:var(--gray);cursor:pointer;transition:all .15s;text-align:center;}.unit-lbl{flex-shrink:0;margin-left:6px;width:46px;text-align:center;font-size:11px;font-weight:700;color:var(--gray-light);}
 .box-toggle.caja{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);}
 
+/* SUGERIDO */
+.sug-section{margin-bottom:14px;}
+.sug-section-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+.sug-item{display:flex;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);gap:8px;}
+.sug-item:last-child{border-bottom:none;}
+.sug-item-name{font-size:14px;font-weight:500;color:var(--ink);}
+.sug-item-qty{font-size:18px;font-weight:700;color:var(--red);text-align:right;}
+.sug-item-unit{font-size:11px;color:var(--gray);text-align:right;margin-top:1px;}
+.sug-badge{display:inline-block;background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);border-radius:4px;font-size:10px;font-weight:700;padding:2px 7px;margin-left:6px;letter-spacing:.04em;}
+.sug-badge.green{background:var(--green-bg);color:#059669;border-color:var(--green-border);}
+
 /* HISTORIAL */
 .hist-entry{border-radius:var(--r);padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .15s;}
 .hist-entry:active{opacity:.85;}
@@ -235,19 +246,23 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--i
 <!-- NAV -->
 <nav class="nav hidden" id="main-nav">
   <button class="nbtn active" id="nb-0" onclick="navHome()">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span>Inicio</span>
   </button>
   <button class="nbtn" id="nb-1" onclick="navInv()">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/></svg>
-    <span>Inventario</span>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/></svg>
+    <span>Inv.</span>
   </button>
   <button class="nbtn" id="nb-2" onclick="navPed()">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
     <span>Pedido</span>
   </button>
-  <button class="nbtn" id="nb-3" onclick="navHist()">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="12" x2="15" y2="14"/></svg>
+  <button class="nbtn" id="nb-3" onclick="navSug()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <span>Smart</span>
+  </button>
+  <button class="nbtn" id="nb-4" onclick="navHist()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
     <span>Historial</span>
   </button>
 </nav>
@@ -315,6 +330,11 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--i
       <div class="mc" onclick="navPed()">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
         <div><div class="mc-title">Pedido sugerido</div><div class="mc-desc">Bebidas e insumos por proveedor</div></div>
+        <svg class="mc-arr" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="mc" onclick="navSug()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <div><div class="mc-title">Pedido inteligente</div><div class="mc-desc">Sugerido automático por fecha</div></div>
         <svg class="mc-arr" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
       <div class="mc" onclick="navHist()">
@@ -530,8 +550,14 @@ function selectUser(u,row){
 }
 function backUsers(){document.getElementById('login-step-turno').classList.remove('show');S.t=null;S.u=null;document.querySelectorAll('.urow').forEach(r=>r.classList.remove('sel'));}
 function selTurno(card){document.querySelectorAll('.tcard').forEach(c=>c.classList.remove('sel'));card.classList.add('sel');S.t=card.dataset.t;document.getElementById('btn-entrar').disabled=false;}
-function entrar(){if(!S.u||!S.t)return;setSpills();navHome();document.getElementById('login-step-turno').classList.remove('show');document.querySelectorAll('.urow,.tcard').forEach(e=>e.classList.remove('sel'));}
-function cambiarUsuario(){closeModal('modal-user');S={u:null,t:null,inv:{},ped:{}};showNav(false);goTo('sc-login');}
+function entrar(){
+  if(!S.u||!S.t)return;
+  localStorage.setItem('mafia_caja_session',JSON.stringify({u:S.u,t:S.t}));
+  setSpills();navHome();
+  document.getElementById('login-step-turno').classList.remove('show');
+  document.querySelectorAll('.urow,.tcard').forEach(e=>e.classList.remove('sel'));
+}
+function cambiarUsuario(){closeModal('modal-user');localStorage.removeItem('mafia_caja_session');S={u:null,t:null,inv:{},ped:{}};showNav(false);goTo('sc-login');}
 (function(){const mn=document.getElementById('mu-name');const sp=document.getElementById('home-spill');const orig=document.getElementById('modal-user');
 document.getElementById('home-spill').onclick=()=>{document.getElementById('mu-name').textContent=S.u+' · '+(S.t==='mañana'?'AM':'PM');openModal('modal-user');}})();
 
@@ -830,7 +856,7 @@ function navHist(){
   var el=document.getElementById('hist-spill');
   if(el&&S.u)el.textContent=pillTxt();
   filterHist('todo',document.getElementById('hf-todo'));
-  goTo('sc-hist');setNav(3);showNav(true);
+  goTo('sc-hist');setNav(4);showNav(true);
 }
 function filterHist(f,btn){
   _histFilter=f;
@@ -951,9 +977,379 @@ function exportarInv(){
   toast('Excel descargado');
 }
 
+
+/* ══ MOTOR DE PEDIDO INTELIGENTE ══
+   Datos ventas Mayo–Agosto 2026 (93 días, 4.403 slices)
+   Informe Iterlog/Astropack Jul–Ago 2026
+   ══════════════════════════════════════ */
+var INTEL = {
+  avg_slice:    47.3,   /* slices/día promedio base */
+  avg_familiar: 7.1,    /* pizzas familiares/día */
+  avg_palito:   3.7,    /* pisa el palito/día */
+
+  /* Factor día semana — índice 0=Lun…6=Dom */
+  dow: [1.00, 1.00, 1.14, 1.23, 1.43, 1.50, 1.29],
+
+  /* Factor semana del mes */
+  wom: {1:1.24, 2:1.00, 3:0.89, 4:1.02, 5:1.11},
+
+  /* Mix bebidas 220ml en promo (% del total) */
+  bev220: {
+    'Coca Cola Normal 220ml': 42.8,
+    'Coca Cola Zero 220ml':   35.5,
+    'Sprite Normal 220ml':    11.2,
+    'Fanta Normal 220ml':     10.5
+  },
+
+  /* Consumo por unidad vendida */
+  per_slice:    {plato23:1, beb220:1},
+  per_familiar: {caja38:1,  beb15:1, pote:1},
+  per_palito:   {caja25:1},
+
+  /* Consumo aseo/semana — basado en informe Iterlog Jul-Ago 2026 */
+  /* Frecuencia ~cada 6 semanas → pedir para 7 días buffer */
+  aseo_semanal: {
+    'Plato Bio 23cm':          292,  /* unidades/sem */
+    'Vasos 16oz':              150,  /* unidades/sem */
+    'Caja 25x25':              1.1,  /* paquetes x50/sem */
+    'Caja 38x38':              1.5,  /* paquetes x50/sem */
+    'Toalla Interfoliada':     2.3,  /* paquetes x200/sem */
+    'Toalla de manos':         1.2,  /* paquetes/sem */
+    'Papel Higiénico':         0.5,  /* paquetes/sem */
+    'Limpiapisos':             3.1,  /* botellas/sem */
+    'Cloro':                   0.8,  /* botellas/sem */
+    'Bolsas Basura Grande':    1.8,  /* paquetes x10/sem */
+    'Bolsas Basura Mediana':   1.3,  /* paquetes x10/sem */
+    'Bolsas Basura Chica':     1.1,  /* paquetes x10/sem */
+    'Paños/Traperos':          1.5,  /* unidades/sem */
+    'Guantes Nitrilo':         0.7,  /* cajas x100/sem */
+    'Lavaloza 5L':             0.3   /* bidones/sem */
+  },
+
+  buffer_days: 8
+};
+
+/* Categorías para las tabs */
+var SUG_CATS = ['Bebidas', 'Packaging', 'Aseo'];
+var _sugCatActive = 'Bebidas';
+var _sugData = null;
+var _sugEdit = {};
+
+function navSug(){
+  var el=document.getElementById('sug-spill');
+  if(el&&S.u)el.textContent=pillTxt();
+  _sugEdit={}; /* reset al entrar para recalcular con stock actual */
+  calcularSug();
+  buildSugPills();
+  switchSugTab('Bebidas', document.querySelector('#sug-pills .pill'));
+  goTo('sc-sug');setNav(3);showNav(true);
+}
+
+function buildSugPills(){
+  var bar=document.getElementById('sug-pills');bar.innerHTML='';
+  SUG_CATS.forEach(function(cat,i){
+    var b=document.createElement('button');
+    b.className='pill'+(i===0?' active':'');
+    b.textContent=cat;
+    b.onclick=function(){switchSugTab(cat,b);};
+    bar.appendChild(b);
+  });
+}
+
+function switchSugTab(cat,btn){
+  _sugCatActive=cat;
+  document.querySelectorAll('#sug-pills .pill').forEach(function(b){b.classList.remove('active');});
+  if(btn)btn.classList.add('active');
+  renderSugList(cat);
+  document.querySelector('#sc-sug .scroll').scrollTop=0;
+}
+
+function calcularSug(){
+  var now=new Date();
+  var buf=INTEL.buffer_days;
+  var totalSlice=0, totalFam=0, totalPalito=0;
+
+  for(var i=0;i<buf;i++){
+    var d=new Date(now);d.setDate(d.getDate()+i);
+    var dowIdx=d.getDay()===0?6:d.getDay()-1;
+    var weekNum=Math.min(5,Math.ceil(d.getDate()/7));
+    var factor=INTEL.dow[dowIdx]*(INTEL.wom[weekNum]||1.0);
+    totalSlice  +=INTEL.avg_slice   *factor;
+    totalFam    +=INTEL.avg_familiar*factor;
+    totalPalito +=INTEL.avg_palito  *factor;
+  }
+  var M=1.10;
+  totalSlice  =Math.ceil(totalSlice  *M);
+  totalFam    =Math.ceil(totalFam    *M);
+  totalPalito =Math.ceil(totalPalito *M);
+
+  /* Bebidas 220 → sixpacks */
+  var bev220total=totalSlice;
+  var bev220sp={};
+  Object.keys(INTEL.bev220).forEach(function(k){
+    bev220sp[k]=Math.ceil(bev220total*INTEL.bev220[k]/100*1.10/6);
+  });
+
+  /* Bebidas 1.5L */
+  var bev15={
+    'Coca Cola Normal 1.5L': Math.ceil(totalFam*0.55*1.15),
+    'Coca Cola Zero 1.5L':   Math.ceil(totalFam*0.45*1.15)
+  };
+
+  /* Packaging */
+  var platos =Math.ceil(totalSlice);
+  var caja38 =Math.ceil(totalFam*1.2);
+  var caja25 =Math.ceil(totalPalito*1.1);
+  var potes  =Math.ceil(totalFam*1.1);
+  var vasos  =Math.ceil(totalSlice*0.05); /* vasos sueltos ~5% estimado */
+
+  /* Aseo — proyección semanal x (buf/7) + 10% */
+  var weeks=buf/7*M;
+  var aseo={};
+  Object.keys(INTEL.aseo_semanal).forEach(function(k){
+    aseo[k]=Math.ceil(INTEL.aseo_semanal[k]*weeks);
+  });
+
+  /* semana del mes y factor hoy */
+  var weekNum1=Math.min(5,Math.ceil(now.getDate()/7));
+  var dowIdx1=now.getDay()===0?6:now.getDay()-1;
+
+  _sugData={
+    buf:buf, totalSlice:totalSlice, totalFam:totalFam, totalPalito:totalPalito,
+    bev220sp:bev220sp, bev15:bev15,
+    platos:platos, caja38:caja38, caja25:caja25, potes:potes, vasos:vasos,
+    aseo:aseo,
+    weekNum:weekNum1, dowIdx:dowIdx1
+  };
+}
+
+/* Lotes mínimos por producto (no se puede pedir menos) */
+var LOTES = {
+  'Cajas Pizza 38×38': 50,
+  'Cajas Pizza 25×25': 50,
+  'Potes Salseros':    50,
+  'Vasos 16oz':        50,
+  'Plato Bio 23"':      1  /* se compran sueltos */
+};
+
+/* Estado editable del smart — se inicializa en calcularSug */
+var _sugEdit = {};
+
+function redondearLote(nombre, qty){
+  var lote = LOTES[nombre] || 1;
+  return Math.ceil(qty / lote) * lote;
+}
+
+/* Obtener stock actual del inventario para un nombre de producto */
+function stockInv(nombre){
+  /* Mapeo nombre smart → id PRODS */
+  var mapa = {
+    'Plato Bio 23"':        'mont',
+    'Cajas Pizza 38×38':    'cj38',
+    'Cajas Pizza 25×25':    'cj25',
+    'Potes Salseros':       'potes',
+    'Vasos 16oz':           'vasos',
+    'Coca Cola Normal 220ml': 'cc220n',
+    'Coca Cola Zero 220ml':   'cc220z',
+    'Sprite Normal 220ml':    'sp220n',
+    'Fanta Normal 220ml':     'fa220n',
+    'Coca Cola Normal 1.5L':  'cc15n',
+    'Coca Cola Zero 1.5L':    'cc15z'
+  };
+  var id = mapa[nombre];
+  if(id && S.inv && S.inv[id]) return S.inv[id].q || 0;
+  return null; /* null = no disponible en inventario */
+}
+
+function renderSugList(cat){
+  var list=document.getElementById('sug-list');
+  if(!list||!_sugData)return;
+  var d=_sugData;
+  list.innerHTML='';
+
+  var items=[];
+  if(cat==='Bebidas'){
+    Object.keys(d.bev220sp).forEach(function(k){
+      items.push({id:k, name:k, qty:d.bev220sp[k], unit:'Sixpacks', prov:'Coca Cola / Dilinor', step:1});
+    });
+    Object.keys(d.bev15).forEach(function(k){
+      items.push({id:k, name:k, qty:d.bev15[k], unit:'Unidades', prov:'Coca Cola / Dilinor', step:1});
+    });
+  } else if(cat==='Packaging'){
+    items=[
+      {id:'Plato Bio 23"',     name:'Plato Bio 23"',     qty:d.platos, unit:'Unidades', prov:'Iterlog SpA',       step:1},
+      {id:'Cajas Pizza 38×38', name:'Cajas Pizza 38×38', qty:d.caja38, unit:'Unidades', prov:'Iterlog / Ekoiskay',step:50},
+      {id:'Cajas Pizza 25×25', name:'Cajas Pizza 25×25', qty:d.caja25, unit:'Unidades', prov:'Iterlog SpA',       step:50},
+      {id:'Potes Salseros',    name:'Potes Salseros',    qty:d.potes,  unit:'Unidades', prov:'Iterlog SpA',       step:50},
+      {id:'Vasos 16oz',        name:'Vasos 16oz',        qty:d.vasos,  unit:'Unidades', prov:'Iterlog SpA',       step:50},
+    ];
+  } else {
+    var aseoMeta={
+      'Toalla Interfoliada':   {unit:'Pqtes x200', prov:'Iterlog SpA',  step:1},
+      'Toalla de manos':       {unit:'Paquetes',   prov:'Iterlog SpA',  step:1},
+      'Papel Higiénico':       {unit:'Paquetes',   prov:'Iterlog SpA',  step:1},
+      'Limpiapisos':           {unit:'Botellas',   prov:'Iterlog SpA',  step:1},
+      'Cloro':                 {unit:'Botellas',   prov:'Iterlog SpA',  step:1},
+      'Bolsas Basura Grande':  {unit:'Pqtes x10',  prov:'Astropack',    step:1},
+      'Bolsas Basura Mediana': {unit:'Pqtes x10',  prov:'Astropack',    step:1},
+      'Bolsas Basura Chica':   {unit:'Pqtes x10',  prov:'Astropack',    step:1},
+      'Paños/Traperos':        {unit:'Unidades',   prov:'Iterlog SpA',  step:1},
+      'Guantes Nitrilo':       {unit:'Cajas x100', prov:'Iterlog SpA',  step:1},
+      'Lavaloza 5L':           {unit:'Bidones',    prov:'Iterlog SpA',  step:1},
+    };
+    Object.keys(aseoMeta).forEach(function(k){
+      items.push({id:k, name:k, qty:d.aseo[k]||0, unit:aseoMeta[k].unit, prov:aseoMeta[k].prov, step:aseoMeta[k].step});
+    });
+  }
+
+  /* Inicializar estado editable si no existe */
+  items.forEach(function(item){
+    if(_sugEdit[item.id]===undefined){
+      /* Aplicar lote mínimo al sugerido */
+      var qBase = redondearLote(item.name, item.qty);
+      /* Descontar stock disponible en inventario */
+      var inv = stockInv(item.name);
+      if(inv!==null && inv>0){
+        /* Convertir stock a misma unidad si es sixpack */
+        var stockUnits = item.unit==='Sixpacks' ? Math.floor(inv/6) : inv;
+        qBase = Math.max(0, qBase - stockUnits);
+        /* Redondear de nuevo al lote */
+        qBase = redondearLote(item.name, qBase);
+      }
+      _sugEdit[item.id] = qBase;
+    }
+  });
+
+  /* Contexto discreto arriba de Bebidas */
+  if(cat==='Bebidas'){
+    var now=new Date();
+    var dd=String(now.getDate()).padStart(2,'0');
+    var mm=String(now.getMonth()+1).padStart(2,'0');
+    var info=document.createElement('div');
+    info.style.cssText='font-size:12px;color:var(--gray);padding:8px 0 12px;display:flex;gap:16px;';
+    info.innerHTML='<span>'+dd+'/'+mm+' · Semana '+d.weekNum+'</span>'
+      +'<span style="color:var(--ink);font-weight:600;">'+d.totalSlice+' slices proyectados</span>';
+    list.appendChild(info);
+  }
+
+  /* Filas con stepper editable */
+  items.forEach(function(item){
+    var inv = stockInv(item.name);
+    var invTxt = inv!==null ? ' · Stock: '+inv : '';
+    var sid = 'sug_'+item.id.replace(/[^a-z0-9]/gi,'_');
+    var curQty = _sugEdit[item.id]||0;
+    var row=document.createElement('div');
+    row.className='prow';
+
+    var infoDiv=document.createElement('div');
+    infoDiv.className='prow-info';
+    infoDiv.innerHTML='<div class="prow-name">'+item.name+'</div>'
+      +'<div style="font-size:11px;color:var(--gray-light);margin-top:1px;">'+item.prov+invTxt+'</div>'
+      +(item.step>1?'<div style="font-size:10px;color:var(--gray-light);">Lote: '+item.step+' un</div>':'');
+    row.appendChild(infoDiv);
+
+    var rightDiv=document.createElement('div');
+    rightDiv.style.cssText='display:flex;align-items:center;gap:4px;flex-shrink:0;';
+    var stepDiv=document.createElement('div');
+    stepDiv.className='stepper';
+
+    var btnM=document.createElement('button');
+    btnM.className='stbtn';btnM.textContent='−';
+    (function(s,it){btnM.onclick=function(){chSugById(s,-it.step,it.step);};})(sid,item);
+    stepDiv.appendChild(btnM);
+
+    var valSpan=document.createElement('span');
+    valSpan.className='ped-val'+(curQty>0?' hi':'');
+    valSpan.id=sid;
+    valSpan.setAttribute('data-id',item.id);
+    valSpan.textContent=curQty;
+    stepDiv.appendChild(valSpan);
+
+    var btnP=document.createElement('button');
+    btnP.className='stbtn';btnP.textContent='+';
+    (function(s,it){btnP.onclick=function(){chSugById(s,it.step,it.step);};})(sid,item);
+    stepDiv.appendChild(btnP);
+
+    rightDiv.appendChild(stepDiv);
+    var unitSpan=document.createElement('span');
+    unitSpan.style.cssText='font-size:10px;color:var(--gray);margin-left:4px;white-space:nowrap;';
+    unitSpan.textContent=item.unit;
+    rightDiv.appendChild(unitSpan);
+    row.appendChild(rightDiv);
+    list.appendChild(row);
+  });
+}
+
+function chSugById(elId, delta, step){
+  var el=document.getElementById(elId);
+  if(!el)return;
+  var id=el.getAttribute('data-id');
+  var cur=_sugEdit[id]||0;
+  var next=Math.max(0, cur+delta);
+  if(delta>0 && step>1 && next%step!==0) next=Math.ceil(next/step)*step;
+  _sugEdit[id]=next;
+  el.textContent=next;
+  el.className='ped-val'+(next>0?' hi':'');
+}
+
+function enviarSugWA(){
+  if(!_sugData){toast('Calcula el sugerido primero');return;}
+  var d=_sugData;
+  var now=new Date();
+  var dd=String(now.getDate()).padStart(2,'0');
+  var mm=String(now.getMonth()+1).padStart(2,'0');
+  var msg='*PEDIDO INTELIGENTE — MAFIA*\n'+S.u+' · '+dd+'/'+mm+'\n\n';
+
+  /* Agrupar items con qty > 0 del estado editable */
+  var beb220Lines=[], beb15Lines=[], packLines=[], aseoLines=[];
+  var d2=_sugData;
+
+  Object.keys(d2.bev220sp).forEach(function(k){
+    var q=_sugEdit[k]!==undefined?_sugEdit[k]:d2.bev220sp[k];
+    if(q>0)beb220Lines.push('• '+k+': '+q+' Sixpacks');
+  });
+  Object.keys(d2.bev15).forEach(function(k){
+    var q=_sugEdit[k]!==undefined?_sugEdit[k]:d2.bev15[k];
+    if(q>0)beb15Lines.push('• '+k+': '+q+' unidades');
+  });
+  var packItems=['Plato Bio 23"','Cajas Pizza 38×38','Cajas Pizza 25×25','Potes Salseros','Vasos 16oz'];
+  packItems.forEach(function(k){
+    var q=_sugEdit[k]!==undefined?_sugEdit[k]:0;
+    if(q>0)packLines.push('• '+k+': '+q+' unidades');
+  });
+  var aseoItems=['Toalla Interfoliada','Toalla de manos','Papel Higiénico','Limpiapisos','Cloro','Bolsas Basura Grande','Bolsas Basura Mediana','Bolsas Basura Chica','Paños/Traperos','Guantes Nitrilo','Lavaloza 5L'];
+  aseoItems.forEach(function(k){
+    var q=_sugEdit[k]!==undefined?_sugEdit[k]:0;
+    if(q>0)aseoLines.push('• '+k+': '+q);
+  });
+
+  if(beb220Lines.length){msg+='*BEBIDAS 220ML*\n'+beb220Lines.join('\n')+'\n\n';}
+  if(beb15Lines.length){msg+='*BEBIDAS 1.5L*\n'+beb15Lines.join('\n')+'\n\n';}
+  if(packLines.length){msg+='*PACKAGING*\n'+packLines.join('\n')+'\n\n';}
+  if(aseoLines.length){msg+='*ASEO*\n'+aseoLines.join('\n')+'\n';}
+
+  if(!beb220Lines.length&&!beb15Lines.length&&!packLines.length&&!aseoLines.length){
+    toast('No hay items con cantidad > 0');return;
+  }
+  abrirWA(msg);
+}
+
+
+
 /* ── TOAST ── */
 let _tt=null;
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');if(_tt)clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2800);}
+
+/* ── RESTAURAR SESIÓN ── */
+(function(){
+  try{
+    var saved=JSON.parse(localStorage.getItem('mafia_caja_session'));
+    if(saved&&saved.u&&saved.t){
+      S.u=saved.u;S.t=saved.t;
+      setSpills();navHome();
+    }
+  }catch(e){}
+})();
 </script>
 
 <!-- ══ HISTORIAL ══ -->
@@ -996,5 +1392,27 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
     <button onclick="closeModal('modal-importar')" style="width:100%;padding:12px;border-radius:var(--r);border:none;background:var(--surface2);font-family:var(--font);font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;">Cancelar</button>
   </div>
 </div>
+
+<!-- ══ SUGERIDO INTELIGENTE ══ -->
+<div class="screen" id="sc-sug">
+  <div class="topbar">
+    <span class="topbar-title">SMART</span>
+    <div class="spill" id="sug-spill">—</div>
+  </div>
+  <!-- Tabs igual que pedido -->
+  <div class="pill-bar" id="sug-pills" style="border-bottom:1px solid var(--border);background:var(--bg);"></div>
+  <div class="scroll">
+    <div style="padding:10px 18px 140px;">
+      <div class="ccard" id="sug-list"></div>
+    </div>
+  </div>
+  <div class="cta">
+    <button class="btn btn-red" onclick="enviarSugWA()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.121 1.532 5.849L.054 23.5l5.821-1.527A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.651-.507-5.173-1.392l-.371-.221-3.853 1.011 1.029-3.752-.242-.387A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+      Enviar
+    </button>
+  </div>
+</div>
+
 </body>
 </html>
